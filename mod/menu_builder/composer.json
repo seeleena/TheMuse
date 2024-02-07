@@ -1,0 +1,15 @@
+{
+	"name": "coldtrick/menu_builder",
+	"description": "More control options for the site menu items or build custom menu's with this plugin",
+	"homepage": "https://www.coldtrick.com",
+	"type": "elgg-plugin",
+	"keywords": ["elgg", "plugin", "navigation"],
+	"license": "GPL-2.0-only",
+	"support": {
+		"source": "https://github.com/ColdTrick/menu_builder",
+		"issues": "https://github.com/ColdTrick/menu_builder/issues"
+	},
+	"conflict": {
+		"elgg/elgg": "<5.0"
+	}
+}

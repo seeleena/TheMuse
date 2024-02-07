@@ -1,0 +1,18 @@
+{
+	"name": "coldtrick/oembed",
+	"description": "Provides oEmbed support for URLs in text",
+	"homepage": "https://www.coldtrick.com",
+	"type": "elgg-plugin",
+	"keywords": ["elgg", "plugin"],
+	"license": "GPL-2.0-only",
+	"support": {
+		"source": "https://github.com/ColdTrick/oembed",
+		"issues": "https://github.com/ColdTrick/oembed/issues"
+	},
+	"require": {
+		"embed/embed": "~4.4.0"
+	},
+	"conflict": {
+		"elgg/elgg": "<5.0"
+	}
+}

@@ -1,0 +1,6 @@
+{
+    "name": "elgg/hello",
+    "type": "elgg-plugin",
+    "description": "Hello World plugin",
+    "license": "GPL-2.0-only"
+}

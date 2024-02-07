@@ -1,0 +1,6 @@
+{
+  "name": "elgg/my_blog",
+  "type": "elgg-plugin",
+  "description": "My Blog plugin",
+  "license": "GPL-2.0-only"
+}
