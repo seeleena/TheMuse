@@ -1,5 +1,10 @@
 <?php
+$title = "Add a course run";
+$vars = array();
 
-echo elgg_view_form('course/saveCourseRun', array('enctype' => 'multipart/form-data'));
+$content = elgg_view('Core/course/newCourseRun', $vars);
+$vars['content'] = $content;
+$body = elgg_view_layout('one_sidebar', $vars);
+echo elgg_view_page($title, $body);
 
 ?>
