@@ -6,6 +6,10 @@ return [
                         'path' => 'Core/instructor/landing',
                         'resource' => 'instructorLanding',
                 ],  
+                'default:Core:student:landing' => [
+                        'path' => 'Core/student/landing',
+                        'resource' => 'studentLanding',
+                ],  
                 'default:Core:course:new' => [
                         'path' => 'Core/course/add',
                         'resource' => 'course/new',
