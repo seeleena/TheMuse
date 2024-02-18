@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'routes' => [
+        'routes' => [
                 'default:Core:instructor:landing' => [
                         'path' => 'Core/instructor/landing',
                         'resource' => 'instructorLanding',
@@ -19,14 +19,40 @@ return [
                         'resource' => 'course/populate',
                 ],
                 'default:Core:course:addAssignment' => [
-                        'path' => 'Core/course/assignment/add',
+                        'path' => 'Core/assignment/add',
                         'resource' => 'course/addAssignment',
                 ],
                 'default:Core:course:newCourseRun' => [
                         'path' => 'Core/course/addRun',
                         'resource' => 'course/newCourseRun',
                 ],
+                'default:Core:assignments:getByCourse' => [
+                        'path' => 'Core/assignments',
+                        'resource' => 'assignment',
+                ],
                   
-    ],
+        ],
+        'actions' => [
+                'course/save' => [],
+                'course/saveCourseRun' => [],
+                'course/populate' => [],
+                'course/addAssignment' => [],
+                'assessment/saveGrades' => [],
+                'assessment/csds' => [],
+                'instructor/setCSDScriteria' => [],
+                'myCreativeProcess/saveNewUserActivity' => [],
+                'myCreativeProcess/saveStudentSurvey' => [],
+                'myTools/roundRobin/save'=> [],
+                'myTools/collaborativeInput/save'=> [],
+                'myTools/conceptFan/save'=> [],
+                'myTools/choice/save'=> [],
+                'myTools/list/save'=> [],
+                'myTools/listAndApply/save'=> [],
+                'myTools/inAndOut/save'=> [],
+                'myTools/report/save'=> [],
+                'myTools/randomWordGenerator/sav'=> [],
+                'uploadSolution/saveZipSolution'=> [],
+                'usersettings/save'=> [],
+        ],
     
 ];

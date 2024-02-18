@@ -97,7 +97,7 @@ $user = elgg_get_logged_in_user_entity();
             <div id="importantLinks">
                 <h4 class="myheader">Important Links:</h4>
                 <ul>
-                    <li><a target="_blank" href="<?php echo getServerURL(); ?>Core/myCreativeProcess/survey">Form Link</a></li>
+                    <li><a target="_blank" href="<?php //echo getServerURL(); ?>Core/myCreativeProcess/survey">Form Link</a></li>
                 </ul>
             </div>            
         </div>

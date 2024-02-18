@@ -1,5 +1,5 @@
 <?php
-//include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
+include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
 $mysqli = get_CoreDB_link("mysqli");
 
 $course = get_input('courseCode');
