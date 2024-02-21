@@ -1,0 +1,28 @@
+{
+  "name": "the-muse-node",
+  "version": "0.0.9",
+  "description": "Node.js backend for The Muse.",
+  "main": "index.js",
+  "dependencies": {
+    "node-persist": "~0.0.1",
+    "socket.io": "~0.9.16",
+    "mongodb": "2.2.12",
+    "mongojs": "2.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node index.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://dianaragbirshripat.visualstudio.com/DefaultCollection/_git/The%20Muse%20Core"
+  },
+  "keywords": [
+    "node",
+    "muse",
+    "elgg"
+  ],
+  "author": "Diana Ragbir-Shripat",
+  "license": "BSD"
+}
