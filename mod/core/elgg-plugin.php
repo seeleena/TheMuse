@@ -30,6 +30,10 @@ return [
                         'path' => 'Core/assignments',
                         'resource' => 'assignment',
                 ],
+                'default:Core:assignments:viewDetails' => [
+                        'path' => 'Core/assignments/viewDetails',
+                        'resource' => 'detailsView',
+                ], 
                   
         ],
         'actions' => [
