@@ -26,10 +26,14 @@ return [
                         'path' => 'Core/course/addRun',
                         'resource' => 'course/newCourseRun',
                 ],
-                'default:Core:assignments:getByCourse' => [
+                /* 'default:Core:assignments:getByCourse' => [
                         'path' => 'Core/assignments',
                         'resource' => 'assignment',
-                ],
+                ], */
+                'default:Core:assignments:getByCourse' => [
+                        'path' => 'Core/assignments/getByCourse',
+                        'resource' => 'getByCourse',
+                ],  
                   
         ],
         'actions' => [
