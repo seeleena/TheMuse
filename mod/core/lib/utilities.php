@@ -24,6 +24,64 @@ function getRandomString($length = 10) {
     return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
 }
 
+function getAll($studentID) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $all = array();
+    $courses = array();
+    $result = $mysqli->query("Select courserun.CourseRunID, courserun.Code from courserun inner join courselist on courserun.CourseRunID = courselist.CourseRunID where courselist.Student_ID = '$studentID'");
+    $result->data_seek(0);
+    $assignments = array();
+    $assignment = array();
+    
+    while ($row = $result->fetch_assoc()) {
+        $courseCode = $row['Code'];
+        $courseRun =  $row['CourseRunID'];
+        $courses[$courseCode] = $courseRun;
+        $result2 = $mysqli->query("SELECT * from assignment WHERE CourseRunID='$courseRun'");
+        $result2->data_seek(0);
+        
+        while ($row2 = $result2->fetch_assoc()) {
+            $assignment['course'] = $courseCode;
+            $assignment['assignID'] = $row2['Assignment_ID'];
+            $assignment['number'] = $row2['Number'];
+            $assignments[] = $assignment;
+        }
+    }
+    $all['courses'] = $courses;
+    $all['assignments'] = $assignments;
+    return $all;
+}
+function getStudentID() {
+    $mysqli = get_CoreDB_link("mysqli");
+    $student_GUID = elgg_get_logged_in_user_guid();
+    $res = $mysqli->query("SELECT Student_ID from student WHERE ELGG_ID='$student_GUID'");
+    $res->data_seek(0);
+    if ($row = $res->fetch_assoc()) {
+        $studentID =  $row['Student_ID'];
+    }
+    return $studentID;
+}
+
+function getUserEntities() {
+    return elgg_get_entities(array(
+    'types' => 'user',
+    'callback' => 'my_get_entity_callback',
+    'limit' => false,
+    ));
+}
+
+function my_get_entity_callback($one_data_row) {
+    $userEntities = array();
+    $userGuid = $one_data_row -> guid;
+    $currentUser = elgg_get_logged_in_user_guid();
+    $userEntity = get_user($userGuid);
+    if(!$userEntity -> isAdmin() && $currentUser != $userGuid) {
+        $userEntities = elgg_view_entity($userEntity);
+    }
+    
+    return $userEntities;
+}
+
 function getCourseCodes () {
     $mysqli = get_CoreDB_link("mysqli");
     $codes = array();
@@ -32,8 +90,47 @@ function getCourseCodes () {
     while ($row = $res->fetch_assoc()) {
         $codes[] =  $row['Code'];
     }
+    sort($codes);
     return $codes;
 }
+
+function getDomain () {
+    $mysqli = get_CoreDB_link("mysqli");
+    $domain = array();
+    $res = $mysqli->query("SELECT DISTINCT domain from questiontype");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $domain[] =  $row['domain'];
+    }
+    sort($domain);
+    return $domain;
+}
+
+function getQuestionTypes () {
+    $mysqli = get_CoreDB_link("mysqli");
+    $questionTypes = array();
+    $res = $mysqli->query("SELECT Name from questiontype");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $questionTypes[] =  $row['Name'];
+    }
+    sort($questionTypes);
+    return $questionTypes;
+}
+
+
+function getAssignments() {
+    $mysqli = get_CoreDB_link("mysqli");
+    $assignments = array();
+    $res = $mysqli->query("SELECT Instructions FROM assignment");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $assignments[] = $row['Instructions'];
+    }
+    sort($assignments);
+    return $assignments;
+}
+
 
 function getStudentNameAndID() {
     $mysqli = get_CoreDB_link("mysqli");

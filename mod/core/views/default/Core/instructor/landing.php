@@ -20,7 +20,7 @@ $urls = array(
     "Add a course run - add the current run of your course for the semester." => "Core/course/addRun", 
     "Populate a course - add students to your course." => "Core/course/populate", 
     "Add a Task/Assignment - add assignments and projects to your course." => "Core/assignment/add",
-    "View completed CPs (creative processes)." => "Core/grading/selectAssignToPrintCP",
+    //for last "View completed CPs (creative processes)." => "Core/grading/selectAssignToPrintCP",
     );
 ?>
     

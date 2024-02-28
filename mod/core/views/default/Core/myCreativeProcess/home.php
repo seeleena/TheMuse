@@ -1,11 +1,13 @@
 <?php
 $codes = array();
 $codes = $vars['courseCodes'];
+$assignments = array();
+$assignments = $vars['assignments'];
 array_unshift($codes, "Select your Course");
 $user = elgg_get_logged_in_user_guid();
 $userEntity = elgg_get_logged_in_user_entity();
 $message  = $_GET['message'];
-system_message($message);
+//system_message($message); 
 ?>
 
 <style>
@@ -59,7 +61,7 @@ system_message($message);
                                     'id' => 'assignments',
                                     'name' => 'assignments',
                                     'value' => 'assignments', 
-                                    'options' => array(0 => "No Course selected")
+                                    'options' => $assignments,
                                     ));
                     ?>              
                     <div class="aHrefLabel">

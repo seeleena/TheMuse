@@ -2,6 +2,10 @@
 
 return [
         'routes' => [
+                'default:Core:myCreativeProcess:home' => [
+                        'path' => 'Core/myCreativeProcess/home',
+                        'resource' => 'myCreativeProcess/home',
+                ],
                 'default:Core:instructor:landing' => [
                         'path' => 'Core/instructor/landing',
                         'resource' => 'instructorLanding',
@@ -20,17 +24,17 @@ return [
                 ],
                 'default:Core:course:addAssignment' => [
                         'path' => 'Core/assignment/add',
-                        'resource' => 'course/addAssignment',
+                        'resource' => 'assignment/addAssignment',
                 ],
                 'default:Core:course:newCourseRun' => [
                         'path' => 'Core/course/addRun',
                         'resource' => 'course/newCourseRun',
                 ],
-                'default:Core:assignments:getByCourse' => [
-                        'path' => 'Core/assignments',
-                        'resource' => 'assignment',
+                'default:Core:assignments:grouping' => [
+                        'path' => 'Core/assignment/grouping',
+                        'resource' => 'assignment/grouping',
                 ],
-                  
+        
         ],
         'actions' => [
                 'course/save' => [],
@@ -53,6 +57,13 @@ return [
                 'myTools/randomWordGenerator/sav'=> [],
                 'uploadSolution/saveZipSolution'=> [],
                 'usersettings/save'=> [],
+        ],
+        'event' => [
+                'register' => [
+			'menu:entity' => [
+				'Elgg\Muse\Menus\Header::register' => [],
+			],
+                ],
         ],
     
 ];

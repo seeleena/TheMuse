@@ -47,11 +47,14 @@ $form_body .= elgg_view('input/dropdown', array(
                 'options' => $codes
                 ));
 
+$assignments = array();
+$assignments = $vars['assignments'];
+array_unshift($assignments, "Select an Assignment");
 $form_body .= elgg_view('input/dropdown', array(
                 'id' => 'assignments',
                 'name' => 'assignments',
                 'value' => 'assignments', 
-                'options' => array(0 => "No Course selected")
+                'options' => $assignments,
                 ));
 
 $form_body .= "<br /><br /><label for='name'>Enter Group Name:</label>";
@@ -74,7 +77,7 @@ echo elgg_view('input/form', array(
 <br/>
 <div class="elgg-head clearfix">
     <h4 class="elgg-heading-main">List of Students Available for Forming Groups</h4>
-</div>
+</div>*/
 $userEntities = array();
 $userEntities = $vars['userEntities'];
 foreach ($userEntities as $userEntity) {
@@ -84,7 +87,7 @@ foreach ($userEntities as $userEntity) {
     }
 }
 
-*/?>
+?>
 <script type="text/javascript">
     $("#courseCode").change(function() { 
         var courseCode = $(this).val();
