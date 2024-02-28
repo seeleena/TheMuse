@@ -9,8 +9,14 @@ include elgg_get_plugins_path()."Core/lib/utilities.php";
 $codes = array();
 $codes = getCourseCodes();
 
-$domainOptions = array("Chemistry", "Computer Science");
-array_unshift($domainOptions, "Choose Domain");
+
+$domainOptions = array();
+$domainOptions = getDomain();
+
+$questionTypes = array();
+$questionTypes = getQuestionTypes();
+
+
 
 $cps = array();
 $cps = getCPs();
@@ -78,7 +84,7 @@ echo elgg_view('input/dropdown', array(
                 'name' => 'questionType',
                 'id' => 'questionType',
                 'value' => 'questionType',
-                'options' => array(0 => "No Domain selected")
+                'options' => $questionTypes
                 ));
 ?>
 <br/><br/>
