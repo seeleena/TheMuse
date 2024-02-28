@@ -17,7 +17,7 @@ $codes = getCourseCodes();
 <?php
 echo elgg_view('input/dropdown', array(
                 'name' => 'courseCode',
-                'value' => 'x`  x',
+                'value' => 'courseCode',
                 'options' => $codes,
                 ));
 ?>

@@ -30,6 +30,11 @@ return [
                         'path' => 'Core/course/addRun',
                         'resource' => 'course/newCourseRun',
                 ],
+
+                'default:Core:assignments:getByCourse' => [
+                        'path' => 'Core/assignments/getByCourse',
+                        'resource' => 'assignment/getByCourse',
+                ],  
                 'default:Core:assignments:grouping' => [
                         'path' => 'Core/assignment/grouping',
                         'resource' => 'assignment/grouping',
@@ -60,10 +65,11 @@ return [
         ],
         'event' => [
                 'register' => [
-			'menu:entity' => [
-				'Elgg\Muse\Menus\Header::register' => [],
-			],
-                ],
-        ],
+			              'menu:entity' => [
+				                'Elgg\Muse\Menus\Header::register' => [],
+			          ],
+                     ],
+         ],
     
 ];
+

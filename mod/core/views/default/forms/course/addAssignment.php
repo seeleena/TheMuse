@@ -9,11 +9,13 @@ include elgg_get_plugins_path()."Core/lib/utilities.php";
 $codes = array();
 $codes = getCourseCodes();
 
+
 $domainOptions = array();
 $domainOptions = getDomain();
 
 $questionTypes = array();
 $questionTypes = getQuestionTypes();
+
 
 
 $cps = array();
@@ -82,7 +84,7 @@ echo elgg_view('input/dropdown', array(
                 'name' => 'questionType',
                 'id' => 'questionType',
                 'value' => 'questionType',
-                'options' => getQuestionTypes() //mark to change with domain specific question types
+                'options' => $questionTypes
                 ));
 ?>
 <br/><br/>

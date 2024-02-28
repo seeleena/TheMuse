@@ -131,7 +131,6 @@ function getAssignments() {
     return $assignments;
 }
 
-
 function getStudentNameAndID() {
     $mysqli = get_CoreDB_link("mysqli");
     $students = array();
