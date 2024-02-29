@@ -1,0 +1,10 @@
+ $title = "Assignment Details";
+        $id = $assignmentParameter;
+        $id = sanitise_int($id, false);
+        $vars = array();
+        $details = array();
+        $details = getAssignmentDetails($id);
+        $vars['details'] = $details;
+        $content = elgg_view('Core/assignments/viewDetails', $vars);
+        echo $content;
+

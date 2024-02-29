@@ -1,10 +1,11 @@
 <?php
 //Note: Include the dbConnection.php in the file that calls this file.
 
-include elgg_get_plugins_path()."Core/lib/dbConnection.php";
+include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
+
 function getServerURL() {
-    //return "http://diana.shripat.com/themuse/";
-    return "http://localhost/elggv2/";
+    return "http://diana.shripat.com/themuse/";
+    //return "http://localhost/elggv2/";
 }
 
 function getApplicationName() {

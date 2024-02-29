@@ -32,7 +32,7 @@ if (!isset($CONFIG)) {
  *
  * @global string $CONFIG->dataroot
  */
-$CONFIG->dataroot = "C:/xampp/htdocs/Muse_data/";
+$CONFIG->dataroot = "C:\xampp\htdocs\Muse_data";
 
 /**
  * The installation root URL of the site. E.g. "https://example.org/elgg/"
@@ -55,7 +55,7 @@ $CONFIG->dbuser = 'admin';
  *
  * @global string $CONFIG->dbpass
  */
-$CONFIG->dbpass = 'admin1';
+$CONFIG->dbpass = 'AlmightyGod1';
 
 /**
  * The database name

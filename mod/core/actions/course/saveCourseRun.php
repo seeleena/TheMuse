@@ -39,7 +39,7 @@ function debug_bind_param(){
 }
 
 include elgg_get_plugins_path()."Core/lib/fileUpload.php"; 
-//include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
+include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
 $mysqli = get_CoreDB_link("mysqli");
 
 if ($mysqli->connect_errno) {

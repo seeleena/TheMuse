@@ -1,19 +1,19 @@
 {
-        "name": "Muse/core",
-        "description": "This is the core thesis code.",
-        "type": "elgg-plugin",
-        "license": "GPL-2.0-only",
-        "authors": [
-          {
-            "name": "Diana Ragbir-Shripat",
-            "homepage": "http://www.elgg.org/"
-          }
-        ],
-        "require": {
-          "elgg/elgg": "^1.8"
-        },
-        "version": "1.0",
-        "extra": {
-          "copyright": "(C) The Muse 2013"
-        }
-      }
+  "name": "themuse/core",
+  "description": "This is the core thesis code.",
+  "type": "elgg-plugin",
+  "license": "GPL-2.0-only",
+  "authors": [
+    {
+      "name": "Diana Ragbir-Shripat",
+      "homepage": "http://www.elgg.org/"
+    }
+  ],
+  "require": {
+    "elgg/elgg": "^1.8"
+  },
+  "version": "1.0",
+  "extra": {
+    "copyright": "(C) The Muse 2013"
+  }
+}

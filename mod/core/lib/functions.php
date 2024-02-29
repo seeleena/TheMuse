@@ -1,7 +1,8 @@
-<?php
-/*
-include elgg_get_plugins_path()."Core/lib/utilities.php";
-include elgg_get_plugins_path()."Core/lib/dbConnection.php";
+<?php 
+
+include elgg_get_plugins_path()."Core/lib/utilities.php"; 
+include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
+
 function login_init() {
     if(elgg_is_admin_logged_in()) {
         forward("Core/instructorLanding");
@@ -208,4 +209,28 @@ function created_object($event, $object_type, $object) {
     $instructionID = $_SESSION['instructionID'];
     $assignmentID = $_SESSION['assignmentID'];
     $activityID = $_SESSION['activityID'];
-};
+    
+//    $entity_guid = (int) get_input($object->guid);
+//    $entity = get_entity($entity_guid);
+//    $entity_name = $entity->getDisplayName();
+ //   error_log("the display name is ".$entity_name);
+
+    storeSocialArtefacts($instructionID, $object->getURL(), $object->getSubtype(), $object->getOwnerGUID(), $groupID, $activityID, $assignmentID);
+    /*
+    error_log("in the method");
+    $objSubType = $object->getSubtype();
+    error_log($event . " " . $object_type . " " . $objSubType);
+    
+    
+    error_log("groupid " .$groupID . "iID " . $instructionID . "assignid " . $assignmentID . "actid " . $activityID);
+    error_log("Object data: url:" . $object->getURL() );//. " name:" . $objSubType->getDisplayName());
+    error_log("user ".$object->getOwnerGUID());*/
+    //$exportableVals = array();
+    //$exportableVals = $object->getExportableValues();
+    //foreach ($exportableVals as $key => $value) {
+        //error_log("the value is : ".$exportableVals['title']);
+        //error_log("the value is : ".$exportableVals['description']);
+        
+    //}
+}
+?>

@@ -1,0 +1,30 @@
+<?php include elgg_get_plugins_path()."Core/lib/utilities.php";
+$title = "Assignment Details";
+
+echo "test";
+$guid=(int) elgg_extract('id',$vars);
+echo $guid;
+echo "end <br>";
+
+echo $_GET['id'];
+$url=$_SERVER['REQUEST_URI'];
+$url_array = explode('/',$url);
+//print_r($url_array);
+
+echo "<br>".$url."<br>";
+$parts= parse_url($url);
+parse_str($parts["query"],$query);
+//print_r($parts);
+//print_r($query);
+$id = (string) elgg_extract('id',$vars);
+
+
+$vars = array();
+        $details = array();
+        $details = getAssignmentDetails($id);
+        $vars['details'] = $details;
+        $content = elgg_view('Core/assignments/viewDetails', $vars);
+        $vars['content'] = $content;
+        $body = elgg_view_layout('one_sidebar', $vars);
+        echo elgg_view_page($title, $body);
+?>

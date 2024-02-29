@@ -1,10 +1,10 @@
 <?php
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
- */
-?>
+ *
+?>*/
+
 .mytext:first-letter{
                text-transform: uppercase;
           }
@@ -93,7 +93,7 @@ list-style-position:inside;
 
 }
 
-/* grading */
+/* grading 
 #assignmentDetails h1 {
     display: none;
 }
@@ -104,7 +104,7 @@ list-style-position:inside;
 
 #projectGroups #allGroups {
     display: none;
-}
+}*/
 
 .smallLabel {
 font-weight: normal;
@@ -492,7 +492,8 @@ font-weight: bold;
 
 }
 
-#nosuggestions {
+/*#nosuggestions {
     text-align: center;
     margin: 20px;
-}
+}*/
+?>

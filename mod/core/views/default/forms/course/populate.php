@@ -4,6 +4,7 @@
         <h2 class="elgg-heading-main">Add Students to your Course</h2>
     </div>
 <?php
+include elgg_get_plugins_path()."Core/lib/utilities.php"; 
 $codes = array();
 $codes = getCourseCodes();
 
