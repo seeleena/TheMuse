@@ -28,7 +28,7 @@ return [
                 ],
                 'default:Core:assignments:getByCourse' => [
                         'path' => 'Core/assignments/getByCourse',
-                        'resource' => 'getByCourse',
+                        'resource' => 'assignments/getByCourse',
                 ],
                   
         ],
