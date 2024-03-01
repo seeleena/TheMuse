@@ -27,8 +27,8 @@ return [
                         'resource' => 'course/newCourseRun',
                 ],
                 'default:Core:assignments:getByCourse' => [
-                        'path' => 'Core/assignments',
-                        'resource' => 'assignment',
+                        'path' => 'Core/assignments/getByCourse',
+                        'resource' => 'getByCourse',
                 ],
                   
         ],
