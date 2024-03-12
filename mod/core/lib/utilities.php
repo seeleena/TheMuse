@@ -98,13 +98,15 @@ function getAssignmentID($groupID, $studentID) {
 
 function getAssignmentDetails($assignmentID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight from assignment WHERE Assignment_ID = ?");
+    $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight, Domain, CourseRunID from assignment WHERE Assignment_ID = ?");
     $statement->bind_param('i', $assignmentID);
     $statement->execute();
-    $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight);
+    $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight, $domain, $courseRunID);
     while ($statement->fetch()) {
         $assignmentDetails = new stdClass();
         $assignmentDetails->id = $assignmentID;
+        $assignmentDetails_domain = $domain;
+        $assignmentDetails->courseRunID = $courseRunID;
         $assignmentDetails->number = $number;
         $assignmentDetails->description = $description;
         $assignmentDetails->startDate = $startDate;
@@ -115,7 +117,6 @@ function getAssignmentDetails($assignmentID) {
     $statement->close();    
     return $assignmentDetails;    
 }
-
 function getAssignmentsByCourseCode($courseCode) {
     $mysqli = get_CoreDB_link("mysqli");
     $courseRunID = getCourseRunByCode($courseCode);
