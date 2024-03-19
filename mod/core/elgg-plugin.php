@@ -30,8 +30,15 @@ return [
                         'path' => 'Core/assignments/getByCourse',
                         'resource' => 'assignment/getByCourse',
                 ],
-                  
-        ],
+                'default:Core:myCreativeProess:uploadZipSolution' => [
+                        'path' => 'Core/myCreativeProcess/uploadZipSolution',
+                        'resource' => 'uploadZipSolution',
+                ],
+                'default:Core:myCreativeProcess:feedbackDashboard' => [
+                        'path' => 'Core/myCreativeProcess/feedbackDashboard',
+                        'resource' => 'feedbackDashboard',
+                ],
+        
         'actions' => [
                 'course/save' => [],
                 'course/saveCourseRun' => [],
