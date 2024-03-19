@@ -1,9 +1,4 @@
-<?php
 
-$creativityFactors = $vars['creativityFactors'];
-
-
-?>
 <style>
     .tile {
         border: #4690D6 1px solid;
@@ -35,9 +30,19 @@ $creativityFactors = $vars['creativityFactors'];
         margin-top: 120px;
     }
 </style>
+
+  <?php 
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
+$title = "Feedback Dashboard";
+$creativityFactors = $vars['creativityFactors'];
+?>
+
 <h1>Feedback</h1>
 <div class="elgg-main elgg-body">
-    <ul class="elgg-menu elgg-breadcrumbs"><li>Feedback Dashboard</li></ul>
+    <ul class="elgg-menu elgg-breadcrumbs">
+        <li>Feedback Dashboard</li>
+    </ul>
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Student Feedback Dashboard</h2>
     </div>
@@ -46,21 +51,19 @@ $creativityFactors = $vars['creativityFactors'];
         <p>Furthermore, there are practice activities and hints available to you should your score fall below 40%. Click on the relevant box for these helpful activities.</p>
     </blockquote>
     <div class="dashboard">
-        <?php
-        $improvementURL = getServerURL() . "/Core/myCreativeProcess/improvementActivities/";
-        foreach ($creativityFactors as $factor) {
-        ?>
-        <div class="tile">
-            <a href='<?php echo $improvementURL . $factor->id?>'>
-                <div class="tile-title" title="Your score on <?php echo $factor->name?>"><?php echo $factor->rating?>%</div>
-                <div class="tile-subtitle" title="Class Average for <?php echo $factor->name?>"><?php echo $factor->classAverage?>%</div>
-                <div class="tile-text"><?php echo $factor->name?></div>
-            </a>
-        </div>        
-        <?php
-        }
-        ?>
-        
+        <?php 
+        $improvementURL = elgg_get_plugins_path() . "/Core/myCreativeProcess/improvementActivities/";
+        foreach ($creativityFactors as $factor) {?>
+            <div class="tile">
+                <a href='<?php echo $improvementURL . $factor->id?>'>
+                    <div class="tile-title" title="Your score on <?php echo $factor->name?>"><?php echo $factor->rating?>%</div>
+                    <div class="tile-subtitle" title="Class Average for <?php echo $factor->name?>"><?php echo $factor->classAverage?>%</div>
+                    <div class="tile-text"><?php echo $factor->name?></div>
+                </a>
+            </div>
+        <?php } ?>
+    </div>
+</div>
 <?php
 /*
         <div class="tile">
@@ -71,5 +74,3 @@ $creativityFactors = $vars['creativityFactors'];
  */
  
 ?>
-    </div>
-</div>
