@@ -71,6 +71,25 @@ $_SESSION['activityID'] = $activityID;
     span.instruction {
         display: none;
     }
+    span.instruction.current {
+        display: block;
+    }
+    .myTextArea {
+        width: 100%;
+        height: 100px;
+    }
+    .background {
+        background-color: #f0f0f0;
+        padding: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+    }
+    .box {
+        margin-bottom: 10px;
+    }
+    .myHr {
+        clear: both;
+    }
 </style>
 <label> Question Prompt: </label><div id="questionPrompt" class="background"></div>
 <label> Specific Hint: </label><div id="specificHint" class="background"></div>

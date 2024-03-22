@@ -3,6 +3,12 @@
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Create My Own Activity</h2>
     </div>
+    <style>
+        .myFields {
+            margin-left: 20px;
+        }
+
+    </style>
     <blockquote>
         <p>You may find it useful to modify your creative process to better suit your needs and your particular
         situation. You can do this by creating an activity which you perform in your creative process that did

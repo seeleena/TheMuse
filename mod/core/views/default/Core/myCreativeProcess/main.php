@@ -19,15 +19,55 @@ $_SESSION['currentAssignID'] = $assignID;
 
 $cpID = getCP($assignID);
 
-setUpAssessmentFile($userid, $assignID);
+//setUpAssessmentFile($userid, $assignID);
 
 $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
 ?>
+
 <div class="elgg-main elgg-body">
     <ul class="elgg-menu elgg-breadcrumbs"><li>The Creative Process Steps</li></ul>
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main"><?php echo $cpName ?></h2>
     </div>
+    <style>
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+        .bubble {
+            position: relative;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+        .rectangle {
+            position: relative;
+            background: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .triangle-l {
+            position: absolute;
+            top: 10px;
+            left: -20px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 20px solid #f9f9f9;
+            border-bottom: 10px solid transparent;
+        }
+    </style>
     <blockquote>
         You are encouraged to use the group you have created for your assignment to share your thoughts,
         problems and insights about your assignment or your course. You can do this via Blogs, Bookmarks,

@@ -34,6 +34,20 @@ $creativityFactors = $vars['creativityFactors'];
     .tile-text {
         margin-top: 120px;
     }
+    .dashboard {
+        margin-top: 20px;
+    }
+    .elgg-head {
+        margin-bottom: 20px;
+    }
+    blockquote {
+        margin-bottom: 20px;
+    }
+    .elgg-main {
+        margin-bottom: 20px;
+    }
+    
+    
 </style>
 <h1>Feedback</h1>
 <div class="elgg-main elgg-body">

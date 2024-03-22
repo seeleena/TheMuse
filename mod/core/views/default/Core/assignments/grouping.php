@@ -3,7 +3,21 @@
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Group Creation for Assignments</h2>
     </div>
-    
+    <Style>
+        .background {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .bullet {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        .bullet li {
+            margin-bottom: 10px;
+        }
+    </Style>
     <blockquote>
         <ul class="bullet">
             <li>
@@ -47,7 +61,6 @@ $form_body .= elgg_view('input/dropdown', array(
                 'options' => $codes
                 ));
 
-
 $assignments = array();
 $assignments = $vars['assignments'];
 array_unshift($assignments, "Select an Assignment");
@@ -72,24 +85,24 @@ echo elgg_view('input/form', array(
 ?>
         </div>
 
+<!-- <div class="elgg-head clearfix">
+    <h4 class="elgg-heading-main">List of Students Available for Forming Groups</h4>
+</div> -->
 
 <?php
-/*
-<br/>
-<div class="elgg-head clearfix">
-    <h4 class="elgg-heading-main">List of Students Available for Forming Groups</h4>
-</div>*/
 
-$userEntities = array();
-$userEntities = $vars['userEntities'];
-foreach ($userEntities as $userEntity) {
-    if(!empty($userEntity)) {
+
+
+// $userEntities = array();
+// $userEntities = $vars['userEntities'];
+// foreach ($userEntities as $userEntity) {
+//     if(!empty($userEntity)) {
         
-        echo $userEntity;
-    }
-}
+//         echo $userEntity;
+//     }
+// }
+
 ?>
-  
 <script type="text/javascript">
     $("#courseCode").change(function() { 
         var courseCode = $(this).val();

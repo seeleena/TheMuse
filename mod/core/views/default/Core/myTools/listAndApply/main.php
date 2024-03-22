@@ -39,7 +39,7 @@ $allPossibilities = array();
 $allPossibilities = getPOs($groupID, $assignmentID);
 
 $message  = $_GET['message'];
-system_message($message);
+//system_message($message); 
 
 ?>
 <style>
@@ -85,6 +85,19 @@ system_message($message);
     }
     li.editable {
         background: gray;
+    }
+    .myBox {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
+    .box {
+        padding: 10px;
+        margin: 10px;
+    }
+    .border {
+        border: 1px solid black;
+        padding: 10px;
     }
 </style>
 <div id="listContainer" class="box">
