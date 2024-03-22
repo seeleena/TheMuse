@@ -30,6 +30,7 @@ $_SESSION['assignmentID'] = $assignmentID;
 $_SESSION['activityID'] = $activityID;
 ?>
 <style>
+    
     #chatContainer div.border {
         border: 1px solid black;
         /*min-height: 50px;*/
@@ -42,10 +43,13 @@ $_SESSION['activityID'] = $activityID;
     #chatContainer {
         float: left;
         width: 700px;
+        padding-top: 10px;
+        padding-right: 10px;
     }
     #formFinishContainer {
         width: 300px;
         float: left;
+        padding-top: 10px;
     }
    
     #chatContainer div.border {
@@ -54,11 +58,9 @@ $_SESSION['activityID'] = $activityID;
         height: 300px;
         overflow: auto;
     }
-    
     input[type="submit"] {
         width: auto;
     }
-    
     #rwgContainer {
         font-size: 50px;
         font-weight: bolder;
@@ -66,6 +68,12 @@ $_SESSION['activityID'] = $activityID;
         color: #4690D6;
         padding: 20px;
     }
+    #rwgContainer:hover {
+        cursor: pointer;
+    }
+
+
+
 </style>
 <div id="rwgContainer" title="Click to copy to clipboard"><?php echo $vars['randomWord']?></div>
 <div id="chatContainer" class="box">

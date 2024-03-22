@@ -47,16 +47,17 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
     #conceptFanContainer {
         width: 100%;
         float: left;
+        padding-top: 50px;
     }
     #conceptFanContainer div.border{
         border: 1px solid black;
-        /*min-height: 50px;*/
+        min-height: 50px;
         height: 500px;
         overflow: auto;
     }
     #chatContainer div.border {
         border: 1px solid black;
-        /*min-height: 50px;*/
+        min-height: 50px;
         overflow: auto;
     }
     #chat {
@@ -137,6 +138,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
     .jstree-leaf a{
         height: auto !important;
     }
+    
 </style>
 <link rel="stylesheet" href="<?php echo getElggJSURL()?>jstree/dist/themes/default/style.min.css" />
 

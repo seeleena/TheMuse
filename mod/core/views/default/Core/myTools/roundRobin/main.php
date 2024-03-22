@@ -125,6 +125,10 @@ $_SESSION['activityID'] = $activityID;
     #formFinishContainer {
         width: 300px;
     }
+    .border {
+        border: 1px solid black;
+        padding: 5px;
+    }
     
 </style>
 <h1>

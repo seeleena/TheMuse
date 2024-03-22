@@ -5,7 +5,7 @@ include elgg_get_plugins_path()."Core/lib/dbConnection.php";
 
 function getServerURL() {
     return "http://diana.shripat.com/themuse/";
-    //return "http://localhost/elggv2/";
+    //return "http://localhost/Muse/";
 }
 
 function getApplicationName() {
@@ -131,6 +131,7 @@ function getAssignments() {
     return $assignments;
 }
 
+
 function getStudentNameAndID() {
     $mysqli = get_CoreDB_link("mysqli");
     $students = array();
@@ -161,10 +162,33 @@ function getStudent($elggID) {
 
 function getCourseRunByCode($courseCode) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID from courserun WHERE Code = ? AND IsArchived = 0");
-    $getCourseRunStatement->bind_param('s', $courseCode);
+    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID, Code, Instructor_ID from courserun WHERE Code = ? AND IsArchived = 0");
+    $getCourseRunStatement->bind_param('i', $courseCode);
     $getCourseRunStatement->execute();
-    $getCourseRunStatement->bind_result($courseRunID);
+    $getCourseRunStatement->bind_result($courseRunID, $code, $instructorID);
+    while ($getCourseRuntatement->fetch()) {
+        $courseRun = new StdClass;
+        $courseRun->id = $courseRunID;
+        $courseRun->code = $code;
+        $courseRun->instructorID = $instructorID;
+    }
+    $getCourseRunStatement->fetch();
+    $getCourseRunStatement->close();
+    return $courseRunID;
+}
+
+function getCourseRunByID($coureRunID) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID, Code, Instructor_ID from courserun WHERE CourseRunID = ?");
+    $getCourseRunStatement->bind_param('i', $coureRunID);
+    $getCourseRunStatement->execute();
+    $getCourseRunStatement->bind_result($courseRunID, $code, $instructorID);
+    while ($getCourseRuntatement->fetch()) {
+        $courseRun = new StdClass;
+        $courseRun->id = $courseRunID;
+        $courseRun->code = $code;
+        $courseRun->instructorID = $instructorID;
+    }
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
     return $courseRunID;
@@ -194,13 +218,15 @@ function getAssignmentID($groupID, $studentID) {
 
 function getAssignmentDetails($assignmentID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight from assignment WHERE Assignment_ID = ?");
+    $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight, Domain, CourseRunID from assignment WHERE Assignment_ID = ?");
     $statement->bind_param('i', $assignmentID);
     $statement->execute();
-    $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight);
+    $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight, $domain, $courseRunID);
     while ($statement->fetch()) {
         $assignmentDetails = new stdClass();
         $assignmentDetails->id = $assignmentID;
+        $assignmentDetails->domain = $domain;
+        $assignmentDetails->courseRunID = $courseRunID;
         $assignmentDetails->number = $number;
         $assignmentDetails->description = $description;
         $assignmentDetails->startDate = $startDate;
@@ -214,18 +240,24 @@ function getAssignmentDetails($assignmentID) {
 
 function getAssignmentsByCourseCode($courseCode) {
     $mysqli = get_CoreDB_link("mysqli");
-    $courseRunID = getCourseRunByCode($courseCode);
-    $assignments = array();
-    $getAssignmentsStatement = $mysqli->prepare("SELECT Number, Assignment_ID from assignment WHERE CourseRunID = ?");
-    $getAssignmentsStatement->bind_param('i', $courseRunID);
-    $getAssignmentsStatement->execute();
-    $getAssignmentsStatement->bind_result($number, $assignID);
-    while ($getAssignmentsStatement->fetch()) {
-        //array_push($assignments, array($number => $assignID));
-        $assignments[$number] = $assignID;
+    $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight, Domain, CourseRunID from assignment WHERE CourseRunID = ?");
+    $statement->bind_param('i', $courseCode);
+    $statement->execute();
+    $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight, $domain, $courseRunID);
+    while ($statement->fetch()) {
+        $assignmentDetails = new stdClass();
+        $assignmentDetails->id = $assignmentID;
+        $assignmentDetails->domain = $domain;
+        $assignmentDetails->courseRunID = $courseRunID;
+        $assignmentDetails->number = $number;
+        $assignmentDetails->description = $description;
+        $assignmentDetails->startDate = $startDate;
+        $assignmentDetails->endDate = $endDate;
+        $assignmentDetails->instructions = $instructions;
+        $assignmentDetails->weight = $weight;
     }
-    $getAssignmentsStatement->close();
-    return $assignments;
+    $statement->close();    
+    return $assignmentDetails;   
 }
 
 function getQuestionTypesByCourseCode($domain) {
@@ -993,7 +1025,7 @@ function getToolName($toolID) {
 /*************
  * Creativity Pedagogy
  */
-function getActivityDetails($activityID, $assignID) {
+function getActivityDetails($activityID /*, $assignID*/) {
     $activity = array();
     //$questionTypeID = getQuestionTypeID($assignID);
 
@@ -1086,10 +1118,8 @@ function getCP($assignID) {
     return $cpID;
 }
 
-function getCPDetails($assignID, $cpID) {
-    if(!isset($cpID)) {
-        $cpID = getCP($assignID);
-    }
+function getCPDetails($assignID) {
+    $cpID = getCP($assignID);
     $mysqli = get_CoreDB_link("mysqli");
     $statement = $mysqli->prepare("SELECT Name, Overview from creativepedagogy WHERE CP_ID = ?");
     $statement->bind_param('i', $cpID);
@@ -2859,6 +2889,64 @@ function getActivityDetailsV2($activityID) {
     $statement1->close();
     
     return $activity;
+}
+
+function getReportURL($groupID, $activityID, $instructionID, $assignmentID) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $getReportURLStatement = $mysqli->prepare("SELECT URL from report WHERE groupid = ? AND activityid = ? AND instructionid = ? AND assignmentid = ?");
+    $getReportURLStatement->bind_param('iiii', $groupID, $activityID, $instructionID, $assignmentID);
+    $getReportURLStatement->execute();
+    $getReportURLStatement->bind_result($reportURL);
+    $getReportURLStatement->fetch();
+    $getReportURLStatement->close();
+    //create one if it doesn't exist.
+    if (empty($reportURL)) {
+        $reportURL = getFirebaseBaseURL() . getRandomString();
+        $updateReportURLStatement = $mysqli->prepare("INSERT INTO report(groupid, activityid, instructionid, assignmentid, URL) VALUES (?, ?, ?, ?, ?)");
+        $updateReportURLStatement->bind_param('iiiis', $groupID, $activityID, $instructionID, $assignmentID, $reportURL);
+        $updateReportURLStatement->execute();
+        error_log($mysqli->error);
+        $updateReportURLStatement->close();
+    }
+    return $reportURL;    
+}
+
+function getCollaborativeInputToolInstructions($instructionID) {
+    $instructions = array();
+    $mysqli = get_CoreDB_link("mysqli");
+    $statement1 = $mysqli->prepare("SELECT CIT_ID, QuestionPrompt, SpecificHint, GroupAnswerHeading from collaborativeinputtoolinstructions WHERE I_ID = ?");
+    $statement1->bind_param('i', $instructionID);
+    $statement1->execute();
+    $statement1->bind_result($citID, $questionPrompt, $specificHint, $groupAnswerHeading);
+    while($statement1->fetch()) {
+        $instruction = new stdClass();
+        $instruction->citID = $citID;
+        $instruction->questionPrompt = $questionPrompt;
+        $instruction->specificHint = $specificHint;
+        $instruction->groupAnswerHeading = $groupAnswerHeading;
+        $instructions[] = $instruction;
+    }
+    $statement1->close();
+    return $instructions;
+}
+
+function getSessionKey($toolAcronym, $groupID, $assignmentID, $instructionID) {
+    return $toolAcronym . "_session_" . $groupID . "_" . $assignmentID . "_" . $instructionID;
+}
+
+function getGroupMembers($groupID, $assignmentID, $user) {
+    if (!isset($assignmentID)) {
+        die("Invalid Assignment.");
+    }
+    if (!isset($user))  {
+        $user = elgg_get_logged_in_user_entity();
+    }
+    if (!isset($groupID)) {
+        $groupID = getGroupID($assignmentID, $user);
+    }
+    $groupMembers = get_group_members($groupID);
+
+    return $groupMembers;
 }
 
 ?>

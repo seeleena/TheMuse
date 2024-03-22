@@ -64,17 +64,21 @@ $_SESSION['activityID'] = $activityID;
         /*min-height: 50px;*/
         height: 150px;
         overflow: auto;
+        
     }
     #chat {
         overflow: auto;
+        
     }
     #chatContainer {
         float: left;
         width: 700px;
+        padding-right: 10px;
     }
     #formFinishContainer {
         width: 300px;
         float: left;
+        padding-top: 10px;
     }
    
     #chatContainer div.border {

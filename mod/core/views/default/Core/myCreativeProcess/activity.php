@@ -12,7 +12,7 @@ $activity = $vars['activity'];
 $activityID = $activity['activityID'];
 $userID = elgg_get_logged_in_user_guid();
 $message  = $_GET['message'];
-system_message($message);
+//system_message($message);
 ?>
   
 <blockquote><p>
@@ -20,7 +20,7 @@ system_message($message);
 </p></blockquote>
 <!--//Help Button link -->
 <div class='btn-container'>
-    <a href='<?php echo getServerURL() . "Core/myCreativeProcess/owner/" . $userID . "?helpme=1&assignID=" . $assignID . "&activityID=" . $activityID . "&stageNum=" . $stageNum?>' class='blu-btn'>Help Me</a>
+    <a href='<?php echo getServerURL() . "Core/myCreativeProcess/owner/". $assignID . "" ?>' class='blu-btn'>Help Me</a>
 </div>
 <?php
 //update

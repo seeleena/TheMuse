@@ -25,6 +25,23 @@
     .ratingContainer {
         padding: 8px;
     }
+    .checkBoxMiddle {
+        text-align: center;
+    }
+    .headingAssessment {
+        text-indent: 0%;
+        padding: 8px;
+    }
+    .numbersOnly {
+        width: 50px;
+    }
+    .elgg-button-submit {
+        margin: 0 auto;
+        display: block;
+    }
+    .elgg-button-submit.active {
+        display: none;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="<?php echo getElggJSURL()?>common/rating.css" />
 <script type="text/javascript" src="<?php echo getElggJSURL()?>common/rating.js"></script>

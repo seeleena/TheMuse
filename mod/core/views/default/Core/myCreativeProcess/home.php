@@ -17,6 +17,16 @@ $message  = $_GET['message'];
     #courseCode, #assignments {
         width: 200px;
     }
+    .aHrefLabel {
+        margin-top: 10px;
+    }
+    .background {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+
 </style>
 <div class="elgg-main elgg-body">
     <ul class="elgg-menu elgg-breadcrumbs"><li>My Creative Process</li></ul>
@@ -94,7 +104,7 @@ $message  = $_GET['message'];
     $("#continue").click(function() {
         var assignID = $("#assignments").val();
         if (parseInt(assignID) > 0) {
-            window.location.href = location.origin + location.pathname.substring(0, location.pathname.indexOf('/', 1)) + "/Core/myCreativeProcess/owner/"+userid+"?assignID="+assignID;
+            window.location.href = location.origin + location.pathname.substring(0, location.pathname.indexOf('/', 1)) + "/Core/myCreativeProcess/owner/"/* +userid+ */"?assignID="+assignID;
         }
         else {
             elgg.system_message("Please select your assignment to continue.");
