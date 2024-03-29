@@ -46,9 +46,9 @@ return [
                 ],
 
                 'default:Core:myCreativeProcess:activity' => [
-                        'path' => 'Core/myCreativeProcess/activity/{activityID}',
+                        'path' => 'Core/myCreativeProcess/activity/{A_ID}',
                         'resource' => 'myCreativeProcess/activity',
-                ],
+	        ],
 
                 'default:Core:myCreativeProcess:feedbackDashboard' => [
                         'path' => 'Core/myCreativeProcess/feedbackDashboard',
