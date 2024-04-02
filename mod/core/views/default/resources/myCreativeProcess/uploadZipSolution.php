@@ -2,6 +2,7 @@
 
 include elgg_get_plugins_path()."Core/lib/utilities.php";
 
+$assignID = (string) elgg_extract('assignID', $vars);
 $title = "Upload Zipped Solution";
 $vars = array();
 $vars['assignID'] = $assignID;
