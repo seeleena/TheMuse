@@ -51,7 +51,7 @@ return [
 	        ],
 
                 'default:Core:myCreativeProcess:feedbackDashboard' => [
-                        'path' => 'Core/myCreativeProcess/feedbackDashboard',
+                        'path' => 'Core/myCreativeProcess/feedbackDashboard/{assignmentID}',
                         'resource' => 'myCreativeProcess/feedbackDashboard',
                 ],
 
