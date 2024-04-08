@@ -3,6 +3,8 @@
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Activity Description</h2>
     </div>
+   
+    
 <?php
 
 $instructions = $vars['instructions'];

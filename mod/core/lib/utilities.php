@@ -4,8 +4,8 @@
 include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
 
 function getServerURL() {
-    return "http://diana.shripat.com/themuse/";
-    //return "http://localhost/Muse/";
+    //return "http://diana.shripat.com/themuse/";
+    return "http://localhost/Muse/";
 }
 
 function getApplicationName() {
@@ -44,6 +44,7 @@ function getAll($studentID) {
             $assignment['course'] = $courseCode;
             $assignment['assignID'] = $row2['Assignment_ID'];
             $assignment['number'] = $row2['Number'];
+            $assignment['description'] = $row2['Description'];
             $assignments[] = $assignment;
         }
     }
@@ -94,6 +95,38 @@ function getCourseCodes () {
     return $codes;
 }
 
+function getStudentCourses ($studentID) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $coursesID = array();
+    $res = $mysqli->query("SELECT CourseRunID from courselist WHERE Student_ID = '$studentID'");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $courses[] =  $row['CourseRunID'];
+    }
+    $course = array();
+    foreach ($courses as $courseID) {
+        $res = $mysqli->query("SELECT Code from courserun WHERE CourseRunID = '$courseID'");
+        $res->data_seek(0);
+        while ($row = $res->fetch_assoc()) {
+            $course[] =  $row['Code'];
+        }
+    }
+    return $course;
+}
+
+function getRunCourseCodes () {
+    $mysqli = get_CoreDB_link("mysqli");
+    $codes = array();
+    $res = $mysqli->query("SELECT Code from courserun WHERE IsArchived = 0");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $codes[] =  $row['Code'];
+    }
+    sort($codes);
+    return $codes;
+
+}
+
 function getDomain () {
     $mysqli = get_CoreDB_link("mysqli");
     $domain = array();
@@ -122,7 +155,7 @@ function getQuestionTypes () {
 function getAssignments() {
     $mysqli = get_CoreDB_link("mysqli");
     $assignments = array();
-    $res = $mysqli->query("SELECT Instructions FROM assignment");
+    $res = $mysqli->query("SELECT Instructions, Assignment_ID FROM assignment");
     $res->data_seek(0);
     while ($row = $res->fetch_assoc()) {
         $assignments[] = $row['Instructions'];
@@ -162,16 +195,10 @@ function getStudent($elggID) {
 
 function getCourseRunByCode($courseCode) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID, Code, Instructor_ID from courserun WHERE Code = ? AND IsArchived = 0");
-    $getCourseRunStatement->bind_param('i', $courseCode);
+    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID from courserun WHERE Code = ? AND IsArchived = 0");
+    $getCourseRunStatement->bind_param('s', $courseCode);
     $getCourseRunStatement->execute();
-    $getCourseRunStatement->bind_result($courseRunID, $code, $instructorID);
-    while ($getCourseRuntatement->fetch()) {
-        $courseRun = new StdClass;
-        $courseRun->id = $courseRunID;
-        $courseRun->code = $code;
-        $courseRun->instructorID = $instructorID;
-    }
+    $getCourseRunStatement->bind_result($courseRunID);
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
     return $courseRunID;
@@ -191,6 +218,7 @@ function getCourseRunByID($coureRunID) {
     }
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
+
     return $courseRunID;
 }
 
@@ -203,6 +231,22 @@ function getAssignmentIDbyCourseRun($courseRunID, $assignNumber){
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
     return $assignID;
+}
+
+function getAssignmentsByCourseCode($courseCode) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $courseRunID = getCourseRunByCode($courseCode);
+    $assignments = array();
+    $getAssignmentsStatement = $mysqli->prepare("SELECT Number, Assignment_ID from assignment WHERE CourseRunID = ?");
+    $getAssignmentsStatement->bind_param('i', $courseRunID);
+    $getAssignmentsStatement->execute();
+    $getAssignmentsStatement->bind_result($number, $assignID);
+    while ($getAssignmentsStatement->fetch()) {
+        //array_push($assignments, array($number => $assignID));
+        $assignments[$number] = $assignID;
+    }
+    $getAssignmentsStatement->close();
+    return $assignments;
 }
 
 function getAssignmentID($groupID, $studentID) {
@@ -238,10 +282,10 @@ function getAssignmentDetails($assignmentID) {
     return $assignmentDetails;    
 }
 
-function getAssignmentsByCourseCode($courseCode) {
+function getAssignmentsByCourseID($courseID) {
     $mysqli = get_CoreDB_link("mysqli");
     $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight, Domain, CourseRunID from assignment WHERE CourseRunID = ?");
-    $statement->bind_param('i', $courseCode);
+    $statement->bind_param('i', $courseID);
     $statement->execute();
     $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight, $domain, $courseRunID);
     while ($statement->fetch()) {
@@ -422,6 +466,7 @@ function storeFileGuidForGroupSolution($groupID, $assignmentID, $fileGuid) {
     $statement->bind_param('iii', $groupID, $assignmentID, $fileGuid);
     $statement->execute();
     $statement->close();
+    return;
 }
 
 function getFileGuidForGroupSolution($groupID, $assignmentID) {
@@ -1030,14 +1075,16 @@ function getActivityDetails($activityID /*, $assignID*/) {
     //$questionTypeID = getQuestionTypeID($assignID);
 
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT Description from activity WHERE A_ID = ?");
+    $statement = $mysqli->prepare("SELECT Description, ShortDescription from activity WHERE A_ID = ?");
     $statement->bind_param('i', $activityID);
     $statement->execute();
-    $statement->bind_result($description);
+    $statement->bind_result($description, $shortDescription);
     $statement->fetch();
     $statement->close();
     $activity['activityID'] = $activityID;
     $activity['description'] = $description;
+    $activity['shortDesc'] = $shortDescription;
+
 
     $statement1 = $mysqli->prepare("SELECT DISTINCT ains.i_id FROM `a_instructions` ains 
                                         INNER JOIN `instructions` ins ON ains.i_id = ins.i_id
@@ -1880,7 +1927,7 @@ function getTotalCFLeafNodesCreated($cfMetrics) {
 }
 
 function getTotalExplorePagesCreatedByUser($startDate, $endDate, $user) {
-    $pages = $user->getObjects('page_top', 100, 0); //could use elgg_get_entities_from_metadata
+    $pages =  $user->getObjects('page_top', 100, 0);; //could use elgg_get_entities_from_metadata
     $totalExplorePages = 0;
     $startDateTimestamp = strtotime($startDate);
     $endDateTimestamp = strtotime($endDate);
@@ -1906,7 +1953,7 @@ function getExploreRating($currentUser, $assignmentDetails) {
     $laaTotalRating = (($laaPOsEditedRating + $laaListAnswersRating) * 25) / 100;
     $sectionRatings[] = $laaTotalRating;
     //*'Explore' page in SN - for a person, and a given time
-    $totalExplorePages = getTotalExplorePagesCreatedByUser($assignmentDetails->startDate, $assignmentDetails->endDate, $currentUser);
+    //$totalExplorePages = getTotalExplorePagesCreatedByUser($assignmentDetails->startDate, $assignmentDetails->endDate, $currentUser);
     $exploreRating = ($totalExplorePages > 0 ? 25 : 0);
     $sectionRatings[] = $exploreRating;
     //*concept fan - all nodes and leaf nodes
@@ -1973,7 +2020,7 @@ function getCommunicationRating($currentUser, $assignmentDetails) {
     $totalChatEntries = getTotalChatEntries($studentID, $assignmentDetails->id);
     $communicationChatRating = getRating($totalChatEntries, 60, 9, 17, 24);
     
-    $totalSocialNetworkingPosts = getTotalSocialNetworkingPosts($currentUser, $assignmentDetails->startDate, $assignmentDetails->endDate);
+    //$totalSocialNetworkingPosts = getTotalSocialNetworkingPosts($currentUser, $assignmentDetails->startDate, $assignmentDetails->endDate);
     $communicationSocialNetworkingRating = getRating($totalSocialNetworkingPosts, 40, 3, 5, 7);
     
     return round($communicationChatRating + $communicationSocialNetworkingRating);
@@ -2615,17 +2662,15 @@ function getAllStudentCriteriaFromDB() {
 }
 
 function storeStudentCriteriaRatings($criteriaType, $ratings) {
-    $sqlCriteriaBulkInsert = array();
-    foreach ($ratings as $studentRating) {
-        $sqlCriteriaBulkInsert[] = 
-        '(' . 
-                mysql_real_escape_string($studentRating->StudentID . ", " . $studentRating->CriteriaID . ", " . $studentRating->Rating) . 
-        ')';
-    }
-    $insertSQL = 'REPLACE INTO student_' . $criteriaType . '_responses (StudentID, CriteriaID, Rating) VALUES ' . implode(',', $sqlCriteriaBulkInsert);   
     $mysqli = get_CoreDB_link("mysqli");
+    $insertSQL = 'REPLACE INTO student_' . $criteriaType . '_responses (StudentID, CriteriaID, Rating) VALUES (?, ?, ?)';
     $statement = $mysqli->prepare($insertSQL);
-    $statement->execute();
+
+    foreach ($ratings as $studentRating) {
+        $statement->bind_param("sss", $studentRating->StudentID, $studentRating->CriteriaID, $studentRating->Rating);
+        $statement->execute();
+    }
+
     error_log($mysqli->error);
     $statement->close();
 }

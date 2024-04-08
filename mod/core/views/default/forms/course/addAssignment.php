@@ -3,18 +3,83 @@
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Add a Task/Assignment</h2>
     </div>
-
+<style> 
+    .myFields {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .myFields small {
+        margin: 10px;
+    }
+    .myFields input[type="text"] {
+        width: 100%;
+    }
+    .myFields input[type="submit"] {
+        margin-top: 10px;
+    }
+    .myFields select {
+        width: 100%;
+    }
+    .myFields label {
+        font-weight: bold;
+    }
+    .myFields h4 {
+        font-weight: bold;
+    }
+    .myFields a {
+        text-decoration: none;
+        color: #000;
+    }
+    .myFields a:hover {
+        text-decoration: underline;
+    }
+    .myFields input[type="radio"] {
+        margin-right: 5px;
+    }
+    .myFields input[type="radio"]:checked {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:hover {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:active {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:focus {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:visited {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:link {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:checked) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:hover) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:active) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:focus) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:visited) {
+        background-color: #f9f9f9;
+    }
+</style>
 <?php
-include elgg_get_plugins_path()."Core/lib/utilities.php"; 
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
 $codes = array();
-$codes = getCourseCodes();
+$codes = getRunCourseCodes();
 
-$domainOptions = array();
-$domainOptions = getDomain();
-
-$questionTypes = array();
-$questionTypes = getQuestionTypes();
-
+$domainOptions = array("Chemistry", "Computer Science");
+array_unshift($domainOptions, "Choose Domain");
 
 $cps = array();
 $cps = getCPs();
@@ -82,7 +147,7 @@ echo elgg_view('input/dropdown', array(
                 'name' => 'questionType',
                 'id' => 'questionType',
                 'value' => 'questionType',
-                'options' => $questionTypes
+                'options' => array(0 => "No Domain selected")
                 ));
 ?>
 <br/><br/>
@@ -94,33 +159,35 @@ echo elgg_view('input/dropdown', array(
 </br>
 <?php
 foreach($cps as $key => $name) {
-    echo "<input type='radio' name='creativePedagogy' id='creativePedagogy' value='$key'><a href='/elgg/Core/grading/creativePedagogy?cpID=$key' target='_blank'>$name</a></br>";
+    echo "<input type='radio' name='creativePedagogy' id='creativePedagogy' value='$key'><a href='/Muse/Core/grading/creativePedagogy/15?cpID=$key' target='_blank'>$name</a></br>";
 }
 ?>
 <br/>
 <?php
 echo elgg_view('input/submit', array('value'=>'Save Assignment'));
 ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-    $("#domain").change(function() { 
-        var domain = $(this).val();
-        var questionTypeDropDown = $("#questionType");
+    jQuery("#domain").change(function() { 
+        var domain = jQuery(this).val();
+        var questionTypeDropDown = jQuery("#questionType");
         questionTypeDropDown.empty();
-        questionTypeDropDown.append($("<option />").val(0).text("Loading question types..."));
+        questionTypeDropDown.append(jQuery("<option />").val(0).text("Loading question types..."));
         questionTypeDropDown.prop("disabled", true);
-        elgg.get('/Core/assignment/getQuestionTypes/' + domain, {
-            success: function(questionTypes, success, xhr) {
-                var questionTypeDropDown = $("#questionType");
+        jQuery.ajax({
+            url: '/Muse/Core/assignment/getQuestionType/' + domain,
+            type: 'GET',
+            success: function(questionTypes) {
                 questionTypeDropDown.empty();
-                questionTypeDropDown.append($("<option />").val(0).text("Select a Question Type"));
-                $.each(questionTypes, function(index) {
+                questionTypeDropDown.append(jQuery("<option />").val(0).text("Select a Question Type"));
+                jQuery.each(questionTypes, function(index) {
                     var questionType = questionTypes[index];
                     var number = Object.keys(questionType)[0];
                     var questionTypeTitle = questionType[number];
-                    questionTypeDropDown.append($("<option />").val(number).text(questionTypeTitle));
+                    questionTypeDropDown.append(jQuery("<option />").val(number).text(questionTypeTitle));
                 });
                 questionTypeDropDown.prop("disabled", false);
-            } 
+            }
         });
     });
 </script>

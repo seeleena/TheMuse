@@ -1,7 +1,7 @@
 <?php
 
 function uploadFile($title, $data) {
-    $file = new FilePluginFile();
+    $file = new ElggFile();
     $file->subtype = "file";
     
     $file->title = $title;

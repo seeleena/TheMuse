@@ -3,6 +3,14 @@
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Add a Course</h2>
     </div>
+    <style>
+        .elgg-form-course-save {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
 <label>
     Course Code
 </label>

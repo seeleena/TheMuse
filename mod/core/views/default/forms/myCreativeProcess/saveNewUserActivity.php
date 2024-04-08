@@ -5,8 +5,72 @@
     </div>
     <style>
         .myFields {
-            margin-left: 20px;
-        }
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .myFields small {
+        margin: 10px;
+    }
+    .myFields input[type="text"] {
+        width: 100%;
+    }
+    .myFields input[type="submit"] {
+        margin-top: 10px;
+    }
+    .myFields select {
+        width: 100%;
+    }
+    .myFields label {
+        font-weight: bold;
+    }
+    .myFields h4 {
+        font-weight: bold;
+    }
+    .myFields a {
+        text-decoration: none;
+        color: #000;
+    }
+    .myFields a:hover {
+        text-decoration: underline;
+    }
+    .myFields input[type="radio"] {
+        margin-right: 5px;
+    }
+    .myFields input[type="radio"]:checked {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:hover {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:active {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:focus {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:visited {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:link {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:checked) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:hover) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:active) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:focus) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:visited) {
+        background-color: #f9f9f9;
+    }
 
     </style>
     <blockquote>

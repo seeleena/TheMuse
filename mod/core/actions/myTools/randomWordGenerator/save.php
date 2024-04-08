@@ -1,4 +1,7 @@
 <?php
+
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
 $toolID = 12;
 $stageNum = get_input('stageNum');
 $StudentELGGID = elgg_get_logged_in_user_guid();

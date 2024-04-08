@@ -9,14 +9,30 @@ return [
 		'name' => 'Core',
 	],
         'bootstrap' => Options::class,
+        'entities' => [
+		[
+			'type' => 'core',
+			'subtype' => 'core',
+			'capabilities' => [
+				'commentable' => false,
+				'searchable' => true,
+				'likable' => false,
+			],
+		],
+	],
         'routes' => [
                 'default:Core:student:landing' => [
                         'path' => 'Core/student/landing',
                         'resource' => 'students/landing',
                 ],  
 
+                'default:Core:student:assignmentListing' => [
+                        'path' => 'Core/assignment/viewAll',
+                        'resource' => 'students/assignmentListing',
+                ],
+
                 'default:Core:myCreativeProcess:uploadZipSolution' => [
-                        'path' => 'Core/myCreativeProcess/uploadZipSolution/{assignID}',
+                        'path' => 'Core/myCreativeProcess/uploadSolution/{assignID}',
                         'resource' => 'myCreativeProcess/uploadZipSolution',
                 ],
 
@@ -41,7 +57,7 @@ return [
                 ],
 
                 'default:Core:myCreativeProcess:main' => [
-                        'path' => 'Core/myCreativeProcess/owner/{assignID}',
+                        'path' => 'Core/myCreativeProcess/owner/{assignID?}',
                         'resource' => 'myCreativeProcess/main',
                 ],
 
@@ -51,12 +67,12 @@ return [
                 ],
 
                 'default:Core:myCreativeProcess:feedbackDashboard' => [
-                        'path' => 'Core/myCreativeProcess/feedbackDashboard',
+                        'path' => 'Core/myCreativeProcess/feedbackDashboard/{assignmentID}',
                         'resource' => 'myCreativeProcess/feedbackDashboard',
                 ],
 
                 'default:Core:myCreativeProcess:improvementActivities' => [
-                        'path' => 'Core/myCreativeProcess/improvementActivities/{myProcessParam}',
+                        'path' => 'Core/myCreativeProcess/improvementActivities/{CFID}',
                         'resource' => 'myCreativeProcess/improvementActivities',
                 ],
 
@@ -96,8 +112,13 @@ return [
                 ],
 
                 'default:Core:assignments:getByCourse' => [
-                        'path' => 'Core/assignment/get/{courseCode}',
+                        'path' => 'Core/assignment/get/{code}',
                         'resource' => 'assignment/getByCourse',
+                ],
+
+                'default:Core:assignments:getQuestionTypeByDomain' => [
+                        'path' => 'Core/assignment/getQuestionType/{domain}',
+                        'resource' => 'assignment/getQuestionTypeByDomain',
                 ],
 
                 'default:Core:myTools:collaborativeInput:main' => [
@@ -155,8 +176,17 @@ return [
                         'resource' => 'myTools/report',
                 ],
 
-                
+                'default:Core:instructor:creativePedagogy' => [
+                        'path' => 'Core/grading/creativePedagogy/{assignID?}',
+                        'resource' => 'grading/creativePedagogy',
+                ],
+
+                'default:Core:instructor:grading' => [
+                        'path' => 'Core/grading',
+                        'resource' => 'grading/main',
+                ],  
         ],
+
         'actions' => [
                 'course/save' => [],
                 'course/saveCourseRun' => [],
@@ -180,12 +210,21 @@ return [
                 'usersettings/save'=> [],
         ],
         'event' => [
-                'register' => [
-			'menu:site' => [
-				'Elgg\Muse\Menus\Site::register' => [],
+                'create' => [
+			'group' => [
+				'Elgg\Muse\Group\Group::store_group_init' => [],
 			],
-                ],
-                
+		],
+                'join' => [
+			'group' => [
+				'Elgg\Muse\Group\Group::join_group_init' => [],
+			],
+		],
+                'leave' => [
+			'group' => [
+				'Elgg\Muse\Group\Group::leave_group_init' => [],
+			],
+		],
         ],
         
     

@@ -1,4 +1,6 @@
 <?php
+    include elgg_get_plugins_path()."Core/lib/utilities.php";
+
     $toolID = 1;
     $stageNum = get_input('stageNum');
     $chatData = get_input('chatData');

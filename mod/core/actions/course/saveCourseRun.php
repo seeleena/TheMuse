@@ -43,7 +43,7 @@ include elgg_get_plugins_path()."Core/lib/dbConnection.php";
 $mysqli = get_CoreDB_link("mysqli");
 
 if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+    return elgg_error_response(elgg_echo("Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error));
 }
 
 $courseCode = get_input('courseCode');
@@ -55,11 +55,17 @@ $userguid = elgg_get_logged_in_user_guid();
 $syllabusFileGuid = uploadFile('syllabus');
 $classListFileGuid = uploadFile('classList');
 
+if (empty($courseCode) || empty($courseRun) || empty($syllabusFileGuid) || empty($classListFileGuid)) {
+    return elgg_error_response(elgg_echo("All fields are required."));
+}
+
 $res = $mysqli->query("UPDATE courserun SET IsArchived='1' WHERE Code='$courseCode'");
 $isArchived = 0;
 $insert_statement = $mysqli->prepare("INSERT INTO courserun(Instructor_ID, Code, CourseRun, IsArchived, SyllabusPath, ClassListPath) VALUES (?, ?, ?, ?, ?, ?)");
 $insert_statement->bind_param('issiii', $userguid, $courseCode, $courseRun, $isArchived, $syllabusFileGuid, $classListFileGuid);
 $insert_statement->execute() or die($mysqli->error);
 $insert_statement->close();
+
+return elgg_ok_response('', elgg_echo($courseCode . ' has been added as running'), null);
 
 ?>

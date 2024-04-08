@@ -1,4 +1,7 @@
 <?php
+
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
 //error_log("<br />concept fan data:<br />" . get_input('conceptFanTreeData'));
 //error_log("<br />all purposes data:<br />" . get_input('allPurposesData'));
 //error_log("<br />chat data:<br />" . get_input('chatData'));

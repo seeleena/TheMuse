@@ -1,4 +1,7 @@
 <?php
+
+    include elgg_get_plugins_path()."Core/lib/utilities.php";
+
     //$viewsData = json_decode(get_input('viewsData'));
     //$chatData = json_decode(get_input('chatData'));
 

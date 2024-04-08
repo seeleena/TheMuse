@@ -1,26 +1,76 @@
 <div class="elgg-main elgg-body">
     <ul class="elgg-menu elgg-breadcrumbs"><li>Activity Details</li></ul>
-    <div class="elgg-head clearfix">
-        <h2 class="elgg-heading-main">Activity Description</h2>
-    </div>
+    
 <?php
  
 $assignID = $_GET['assignID'];
 $stageNum = $_GET['stageNum'];
-$activity = array();
 $activity = $vars['activity'];
 $activityID = $activity['activityID'];
 $userID = elgg_get_logged_in_user_guid();
-$message  = $_GET['message'];
-//system_message($message);
 ?>
   
+    <style>
+        .bubble {
+            position: relative;
+            width: 100%;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #c9c9c9;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .rectangle {
+            position: relative;
+            width: 100%;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #c9c9c9;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .blu-btn {
+            display: inline-block;
+            padding: 10px 10px;
+            background: #34b4db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        .myAlignLeft {
+            text-align: left;
+        }
+        .mytext {
+            text-align: left;
+        }
+        .imgStyle {
+            float: left;
+            margin-right: 10px;
+        }
+    </style>
+
+    <div class="elgg-head clearfix">
+        <h2 class="elgg-heading-main"> <?php echo  $activity['shortDesc'] ?> Activity </h2>
+    </div>
+
 <blockquote><p>
-<?php echo $activity['description'] ?>
+    <?php echo $activity['description'] ?>
 </p></blockquote>
 <!--//Help Button link -->
 <div class='btn-container'>
-    <a href='<?php echo getServerURL() . "Core/myCreativeProcess/owner/". $assignID . "" ?>' class='blu-btn'>Help Me</a>
+<?php
+$params = array(
+    'assignID' => $assignID,
+    'activityID' => $activityID,
+    'stageNum' => $stageNum,
+    'helpme' => 'true'
+);
+$queryString = http_build_query($params);
+$url = getServerURL() . "Core/myCreativeProcess/owner/" . $assignID . "?" . $queryString;
+?>
+<a href='<?php echo $url ?>' class='blu-btn'>Help Me</a>
+
 </div>
 <?php
 //update
@@ -29,9 +79,10 @@ $instructions = $activity['instructions'];
 $instruction = new StdClass();
 $tools = array();
 $lines = array();
-$i =0;
+$i =0; 
 $siteURL = elgg_get_site_url().'_graphics/themuse/pensive.jpg';
-//add user-added instructions and tools here. this for below will be empty? since the activity would not exist.
+//add user-added instructions and tools here. 
+//this for below will be empty? since the activity would not exist.
 //so use and isset on the array.
 foreach ($instructions as $instruction) {
     $i++;
@@ -84,8 +135,8 @@ foreach ($instructions as $instruction) {
         //      act:10, instr:13, 9
         //      act:18, instr:54, 3
         //      act:18, instr:55, 2
-        // As separate from completion rate, I need the number of answers posted per CIT_ID per user, 
-        // which means number of answers per question by student.
+        //As separate from completion rate, I need the number of answers posted per CIT_ID per user, 
+        //which means number of answers per question by student.
         //The JSON structure for CIT from the DB is :
         /*** SAMPLE DATA STRUCTURE FOR ALLRESPONSES ***/
 /*

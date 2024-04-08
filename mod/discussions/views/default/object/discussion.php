@@ -5,7 +5,7 @@
  * @uses $vars['entity'] ElggDiscussion to show
  */
 
-use Elgg\Exceptions\Http\EntityNotFoundException;
+//use Elgg\Exceptions\Http\EntityNotFoundException;
 
 $full_view = (bool) elgg_extract('full_view', $vars, false);
 $entity = elgg_extract('entity', $vars, false);

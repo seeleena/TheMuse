@@ -4,7 +4,7 @@ include elgg_get_plugins_path()."Core/lib/utilities.php";
 
 $title = "Assignment Grouping";
 $vars = array();
-$vars['user'] = elgg_get_page_owner_entity();
+$vars['user'] = elgg_get_logged_in_user_entity();
 
 $vars['courseCodes'] = getCourseCodes();
 $vars['assignments'] = getAssignments();

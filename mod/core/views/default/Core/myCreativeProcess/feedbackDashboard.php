@@ -46,7 +46,7 @@ $creativityFactors = $vars['creativityFactors'];
     .elgg-main {
         margin-bottom: 20px;
     }
-    
+
     
 </style>
 <h1>Feedback</h1>

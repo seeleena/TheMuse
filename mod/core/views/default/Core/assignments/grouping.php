@@ -17,7 +17,12 @@
         .bullet li {
             margin-bottom: 10px;
         }
+        .elgg-heading-main{
+            padding: ;
+        }
+
     </Style>
+    <div>
     <blockquote>
         <ul class="bullet">
             <li>
@@ -46,7 +51,8 @@
             </li>
         </ul>
     </blockquote>
-    <div class="elgg-head clearfix">
+    <div>
+    <div class="elgg-head-clearfix">
         <h4 class="elgg-heading-main">Create a New Group</h4>
     </div>
     <div class="background">
@@ -85,24 +91,21 @@ echo elgg_view('input/form', array(
 ?>
         </div>
 
-<!-- <div class="elgg-head clearfix">
+
+<div class="elgg-head-clearfix">
     <h4 class="elgg-heading-main">List of Students Available for Forming Groups</h4>
-</div> -->
-
+</div>
 <?php
-
-
-
-// $userEntities = array();
-// $userEntities = $vars['userEntities'];
-// foreach ($userEntities as $userEntity) {
-//     if(!empty($userEntity)) {
+$userEntities = array();
+$userEntities = $vars['userEntities'];
+foreach ($userEntities as $userEntity) {
+    if(!empty($userEntity)) {
         
-//         echo $userEntity;
-//     }
-// }
-
+        echo $userEntity;
+    }
+}
 ?>
+
 <script type="text/javascript">
     $("#courseCode").change(function() { 
         var courseCode = $(this).val();

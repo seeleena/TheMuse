@@ -1,4 +1,6 @@
 <?php
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
 $chatData = get_input('chatData');
 //error_log("chat raw: " . $chatData);
 //error_log("allListItemsData raw: " . get_input('allListItemsData'));

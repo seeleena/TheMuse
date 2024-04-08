@@ -1,4 +1,6 @@
 <?php
+include elgg_get_plugins_path()."Core/lib/utilities.php";
+
 $chatData = get_input('chatData');
 $allPossibilitiesData = json_decode(get_input('allPossibilitiesData'));
 

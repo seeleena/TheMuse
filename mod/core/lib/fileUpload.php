@@ -1,22 +1,34 @@
 <?php
 
+function get_simple_type($mime_type) {
+    
+        switch ($mime_type) {
+            case 'image/jpeg':
+            case 'image/png':
+            case 'image/gif':
+                return 'image';
+            case 'text/plain':
+                return 'document';
+            // Add more cases as needed...
+            default:
+                return 'unknown';
+        }
+}
+
 function uploadFile($title) {
     //elgg_make_sticky_form('file');
 
     // check if upload failed
     if (!empty($_FILES[$title]['name']) && $_FILES[$title]['error'] != 0) {
-            register_error(elgg_echo('file:cannotload'));
-            forward(REFERER);
+        return elgg_error_response(elgg_echo('file:cannotload'));
     }
     
     // must have a file if a new file upload
     if (empty($_FILES[$title]['name'])) {
-            $error = elgg_echo('file:nofile');
-            register_error($error);
-            forward(REFERER);
+        return elgg_error_response(elgg_echo('file:uploadfailed'));
     }
 
-    $file = new FilePluginFile();
+    $file = new ElggFile();
     $file->subtype = "file";
 
     // if no title on new upload, grab filename
@@ -32,7 +44,7 @@ function uploadFile($title) {
             $filestorename = elgg_strtolower($_FILES[$title]['name']);
             $file->setFilename($prefix . $filestorename);
             $file->originalfilename = $_FILES[$title]['name'];
-            $mime_type = $file->detectMimeType($_FILES[$title]['tmp_name'], $_FILES[$title]['type']);
+            $mime_type = $file->getMimeType($_FILES[$title]['tmp_name'], $_FILES[$title]['type']);
 
             // hack for Microsoft zipped formats
             $info = pathinfo($_FILES[$title]['name']);
@@ -57,7 +69,7 @@ function uploadFile($title) {
             }
 
             $file->setMimeType($mime_type);
-            $file->simpletype = file_get_simple_type($mime_type);
+            $file->simpletype = get_simple_type($mime_type);
 
             // Open the file to guarantee the directory exists
             $file->open("write");

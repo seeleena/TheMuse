@@ -11,14 +11,16 @@ $courseCode = get_input('code');
 $courseTitle = get_input('title');
 $courseCredits = get_input('credits');
 
+
 if (empty($courseCode) || empty($courseTitle) || (!is_numeric($courseCredits) || $courseCredits < 0)) {
-    $error = "All fields are required and course credits must be a positive number.";
-    echo $error;
+    return elgg_error_response(elgg_echo("All fields are required and course credits must be a positive number."));
 } else {
     $insert_statement = $mysqli->prepare("INSERT INTO course(Code, Title, Credits) VALUES (?, ?, ?)");
 	$insert_statement->bind_param('ssi', $courseCode, $courseTitle, $courseCredits);
 	$insert_statement->execute();
 	$insert_statement->close();
 }
+
+return elgg_ok_response('', elgg_echo($courseCode . ' has been saved'), null);
 
 ?>
