@@ -7,7 +7,14 @@
         <p>Allow yourself some time to think about your problem. Get out of your chair to stimulate
         those thinking juices!</p>
     </blockquote>
-
+    <style> 
+        .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+    </style>
     <ol class="innerList list">
         <li>Just stand up and sit down - no hands.</li>
         <li>

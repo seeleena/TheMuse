@@ -50,8 +50,8 @@ $_SESSION['activityID'] = $activityID;
             <br />
             <input type="button" id="btnReset" name="btnReset" value="Reset"/>
             <script>
-                $(document).ready(function() {
-                    $("#btnReset").click(function() {
+                jQuery(document).ready(function() {
+                    jQuery("#btnReset").click(function() {
                         var confirmed = confirm("This will clear all Opinions/Views. Press OK to continue.");
                         if (confirmed === true) {
                             window.location.search += "&reset=1";
@@ -197,7 +197,11 @@ $_SESSION['activityID'] = $activityID;
     ));    
     ?>
 </div>
-<script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
+<script type="text/javascript">
     var ENTER_KEY_CODE = 13;
     var currentUser = "<?php echo $currentUser->name; ?>";
     var roomKey = "<?php echo $sessionKey; ?>";
@@ -205,7 +209,7 @@ $_SESSION['activityID'] = $activityID;
     var userViewsData;
     var started = false;
     var submittedByCurrentUser = false;
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             socket.emit("rr_join_room", { room: roomKey, user: currentUser });
@@ -213,7 +217,7 @@ $_SESSION['activityID'] = $activityID;
         
         socket.on("acknowledgement", function(data) {
             if (data.messageType === "chat") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "userView") {
@@ -237,30 +241,30 @@ $_SESSION['activityID'] = $activityID;
             }
         });
         
-        $("#userView").keyup(function(e) {
+        jQuery("#userView").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                $("#viewsEnteredCount").val(1);
-                var userViewMessageBox = $(this);
+                jQuery("#viewsEnteredCount").val(1);
+                var userViewMessageBox = jQuery(this);
                 var userView = userViewMessageBox.val();
-                $(this).val("");
-                $(this).prop("disabled", true);
+                jQuery(this).val("");
+                jQuery(this).prop("disabled", true);
                 setUserViewStatus(currentUser, "Completed");
                 socket.emit("rr_userView_message", { room: roomKey, user: currentUser, view: userView });
             }
         });
         
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                updateCount($("#chatEntriesCount"));
-                var chatMessageBox = $(this);
+                updateCount(jQuery("#chatEntriesCount"));
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
-                $(this).val("");
+                jQuery(this).val("");
                 storeChatMessage(currentUser, message);
                 socket.emit("rr_chat_message", { room: roomKey, user: currentUser, clientMessage: message, chatData: chatData });
             }
         });        
         
-        $("#formFinish").submit(function() {
+        jQuery("#formFinish").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storeTimingData();
@@ -268,7 +272,7 @@ $_SESSION['activityID'] = $activityID;
             return true;
         });
         
-        $(window).unload(function() {
+        jQuery(window).unload(function() {
             console.log('unloading...');
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             console.log('time on page: ' + timeSpentOnPage);
@@ -302,11 +306,11 @@ $_SESSION['activityID'] = $activityID;
     }
     
     function setUserViewStatus(user, status) {
-        $("#memberStatus tr td.member[data-member='" + user + "']").next().html(status);
+        jQuery("#memberStatus tr td.member[data-member='" + user + "']").next().html(status);
     }
 
     function writeMessage(container, user, message) {
-        container.append($("<li>" + user + ": " + message + "</li>"));
+        container.append(jQuery("<li>" + user + ": " + message + "</li>"));
         container[0].scrollTop = container[0].scrollHeight;
     }
     
@@ -315,7 +319,7 @@ $_SESSION['activityID'] = $activityID;
             serverChatData = [];
         }
         chatData = serverChatData;
-        var chatContainer = $("#chat");
+        var chatContainer = jQuery("#chat");
         for (var i = 0; i < chatData.length; i++) {
             writeMessage(chatContainer, chatData[i].user, chatData[i].message);
         }
@@ -330,14 +334,14 @@ $_SESSION['activityID'] = $activityID;
     }
     
     function storeChatData(user, serverChatData) {
-        var chatDataField = $("#chatData");
+        var chatDataField = jQuery("#chatData");
         chatData = serverChatData;
         chatDataField.val(JSON.stringify(chatData));
     }
     
     function storeUserViewsdata(userViews) {
         userViewsData = userViews;
-        $("#viewsData").val(JSON.stringify(userViewsData));
+        jQuery("#viewsData").val(JSON.stringify(userViewsData));
     }
     
 </script>

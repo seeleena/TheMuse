@@ -552,30 +552,40 @@ function getCollaborativeInputMetrics($activityID, $assignmentID, $studentID, $i
     return $metricsData;
 }
 
+function executeStatementCollaborativeInputMetrics($mysqli, $query, $params, $isSelect = false) {
+    $statement = $mysqli->prepare($query);
+    $statement->bind_param(str_repeat('i', count($params)), ...$params);
+    $statement->execute();
+    if ($isSelect) {
+        $statement->bind_result($dbChatEntriesCount, $dbTimeOnPage);
+        $statement->fetch();
+        return [$dbChatEntriesCount, $dbTimeOnPage];
+    }
+    $statement->close();
+}
+
 function storeCollaborativeInputMetrics($activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getStoredCollaborativeInputMetrics = $mysqli->prepare("SELECT ChatEntriesCount, TimeOnPage from collaborativeinputmetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-    $getStoredCollaborativeInputMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
-    $getStoredCollaborativeInputMetrics->execute();
-    $getStoredCollaborativeInputMetrics->bind_result($dbChatEntriesCount, $dbTimeOnPage);
-    $getStoredCollaborativeInputMetrics->fetch();
-    $getStoredCollaborativeInputMetrics->close();
+    $query = "SELECT ChatEntriesCount, TimeOnPage from collaborativeinputmetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?";
+    list($dbChatEntriesCount, $dbTimeOnPage) = executeStatementCollaborativeInputMetrics($mysqli, $query, [$activityID, $assignmentID, $studentID, $instructionID], true);
 
+    if (isset($dbChatEntriesCount) && $dbTimeOnPage > 0) {
+        updateCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage, $dbChatEntriesCount, $dbTimeOnPage);
+    } else {
+        insertCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage);
+    }
+}
 
-    if (isset($dbChatEntriesCount) && $dbTimeOnPage > 0) { //if it exists, add the new numbers
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE collaborativeinputmetrics SET ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-        $updateStatement->bind_param('iiiisi', $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
-        $updateStatement->execute();
-        $updateStatement->close();        
-    }
-    else { //insert a row if it's new
-        $insertStatement = $mysqli->prepare("INSERT INTO collaborativeinputmetrics(ActivityID, AssignmentID, StudentID, InstructionID, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iisiii', $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();        
-    }
+function updateCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage, $dbChatEntriesCount, $dbTimeOnPage) {
+    $dbChatEntriesCount += $chatEntriesCount;
+    $dbTimeOnPage += $timeOnPage;
+    $query = "UPDATE collaborativeinputmetrics SET ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?";
+    executeStatementCollaborativeInputMetrics($mysqli, $query, [$dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID]);
+}
+
+function insertCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage) {
+    $query = "INSERT INTO collaborativeinputmetrics(ActivityID, AssignmentID, StudentID, InstructionID, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)";
+    executeStatementCollaborativeInputMetrics($mysqli, $query, [$activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage]);
 }
 
 function getSpecificListAndApplyMetrics($activityID, $assignmentID, $studentID, $instructionID) {
@@ -929,45 +939,49 @@ function getUserCPEngagement($assignmentID, $StudentELGGID, $toolID) {
     return $cpEngagement;
 }
 
+function executeStatement($mysqli, $query, $params, $isSelect = false) {
+    $statement = $mysqli->prepare($query);
+    $statement->bind_param(str_repeat('i', count($params)), ...$params);
+    $statement->execute();
+    if ($isSelect) {
+        $statement->bind_result($numberOfRows);
+        $statement->fetch();
+        return $numberOfRows;
+    }
+    $statement->close();
+}
+
 function storeUserCPEngagement($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
     if (studentHasUsedToolInStage($StageNum, $assignmentID, $StudentELGGID, $toolID)) {
         if (studentHasUsedToolInAdvancedStage($StageNum, $assignmentID, $StudentELGGID, $toolID)) {
-            //increment iteration
-            $statement = $mysqli->prepare("UPDATE usercpengagement SET Iteration = Iteration + 1 WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-            $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-            $statement->execute();
-            $statement->close();
+            updateUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID);
         }
+    } else {
+        insertUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID);
     }
-    else {
-        $statement = $mysqli->prepare("INSERT INTO usercpengagement(StageNumber, Assignment_ID, Student_ELGG_ID, Tool_ID, Iteration) VALUES (?, ?, ?, ?, ?)");
-        $statement->bind_param('iiiii', $StageNum, $assignmentID, $StudentELGGID, $toolID, $iteration = 1);
-        $statement->execute();
-        $statement->close();
-    }
+}
+
+function updateUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID) {
+    $query = "UPDATE usercpengagement SET Iteration = Iteration + 1 WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID]);
+}
+
+function insertUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID) {
+    $query = "INSERT INTO usercpengagement(StageNumber, Assignment_ID, Student_ELGG_ID, Tool_ID, Iteration) VALUES (?, ?, ?, ?, ?)";
+    executeStatement($mysqli, $query, [$StageNum, $assignmentID, $StudentELGGID, $toolID, 1]);
 }
 
 function studentHasUsedToolInAdvancedStage($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber > ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-    $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-    $statement->execute();
-    $statement->bind_result($numberOfRows);
-    $statement->fetch();
-    $statement->close();
-    return $numberOfRows > 0;
+    $query = "SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber > ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    return executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID], true) > 0;
 }
 
 function studentHasUsedToolInStage($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-    $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-    $statement->execute();
-    $statement->bind_result($numberOfRows);
-    $statement->fetch();
-    $statement->close();
-    return $numberOfRows > 0;
+    $query = "SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    return executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID], true) > 0;
 }
 
 function getGroupSolutionCreativeProcessByTool($groupID, $assignmentID, $activityID, $instructionID, $toolID) {
@@ -2957,7 +2971,6 @@ function getReportURL($groupID, $activityID, $instructionID, $assignmentID) {
 }
 
 function getCollaborativeInputToolInstructions($instructionID) {
-    $instructions = array();
     $mysqli = get_CoreDB_link("mysqli");
     $statement1 = $mysqli->prepare("SELECT CIT_ID, QuestionPrompt, SpecificHint, GroupAnswerHeading from collaborativeinputtoolinstructions WHERE I_ID = ?");
     $statement1->bind_param('i', $instructionID);
@@ -2980,16 +2993,16 @@ function getSessionKey($toolAcronym, $groupID, $assignmentID, $instructionID) {
 }
 
 function getGroupMembers($groupID, $assignmentID, $user) {
-    if (!isset($assignmentID)) {
-        die("Invalid Assignment.");
+    
+    $mysqli = get_CoreDB_link("mysqli");
+    $groupMembers = array();
+    $statement = $mysqli->prepare("SELECT s.ELGG_ID, s.Name FROM grouplist g INNER JOIN student s ON g.StudentELGG_ID = s.ELGG_ID WHERE g.GroupELGG_ID = ? AND g.AssignmentID = ? AND g.StudentELGG_ID != ?");
+    $statement->bind_param('iii', $groupID, $assignmentID, $user);
+    $statement->execute();
+    $statement->bind_result($studentID, $studentName);
+    while ($statement->fetch()) {
+        $groupMembers[] = array('id' => $studentID, 'name' => $studentName);
     }
-    if (!isset($user))  {
-        $user = elgg_get_logged_in_user_entity();
-    }
-    if (!isset($groupID)) {
-        $groupID = getGroupID($assignmentID, $user);
-    }
-    $groupMembers = get_group_members($groupID);
 
     return $groupMembers;
 }

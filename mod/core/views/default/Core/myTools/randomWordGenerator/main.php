@@ -30,7 +30,12 @@ $_SESSION['assignmentID'] = $assignmentID;
 $_SESSION['activityID'] = $activityID;
 ?>
 <style>
-    
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
+    }
     #chatContainer div.border {
         border: 1px solid black;
         /*min-height: 50px;*/
@@ -109,6 +114,7 @@ $_SESSION['activityID'] = $activityID;
     ));
     ?>
 </div>  
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -171,7 +177,7 @@ $_SESSION['activityID'] = $activityID;
         return succeed;
     }
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             socket.emit("rwg_start", { room: roomKey, user: currentUser });
@@ -185,7 +191,7 @@ $_SESSION['activityID'] = $activityID;
                 }
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "rwg_form_finished") {
@@ -198,9 +204,9 @@ $_SESSION['activityID'] = $activityID;
             }
         });
        
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                var chatMessageBox = $(this);
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -209,16 +215,16 @@ $_SESSION['activityID'] = $activityID;
         });
         
         function storeRandomWordGeneratorData() {
-//            var wordCount = firepad.getText().trim().split(/\s+/).length;
-//            $("#wordCount").val(wordCount);
+            //var wordCount = firepad.getText().trim().split(/\s+/).length;
+            //jQuery("#wordCount").val(wordCount);
         }
         
-        $("#rwgContainer").click(function() {
+        jQuery("#rwgContainer").click(function() {
             copyToClipboard(this);
-            elgg.system_message("'" + $(this).text() + "' copied to clipboard.");
+            elgg.system_message("'" + jQuery(this).text() + "' copied to clipboard.");
         });
         
-        $("#rwgForm").submit(function() {
+        jQuery("#rwgForm").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storeRandomWordGeneratorData();
@@ -227,7 +233,7 @@ $_SESSION['activityID'] = $activityID;
             return true;            
         });
         
-        $(window).unload(function() {
+        jQuery(window).unload(function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
                 success: function(result, success, xhr) {

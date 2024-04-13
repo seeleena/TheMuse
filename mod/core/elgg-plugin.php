@@ -122,41 +122,41 @@ return [
                 ],
 
                 'default:Core:myTools:collaborativeInput:main' => [
-                        'path' => 'Core/myTools/collaborativeInput/{instructionID}/{assignmentID}/{activityID}', 
+                        'path' => 'Core/myTools/collaborativeInput/', 
                         'resource' => 'myTools/collaborativeInput',
                 ],
 
                 'default:Core:myTools:listAndApply:main' => [
-                        'path' => 'Core/myTools/listAndApply/{instructionID}/{assignmentID}/{activityID}', 
+                        'path' => 'Core/myTools/listAndApply/', 
                         'resource' => 'myTools/listAndApply',
                 ],
                 
                 'default:Core:myTools:roundRobin:main' => [
-                        'path' => 'Core/myTools/roundRobin/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/roundRobin/',
                         'resource' => 'myTools/roundRobin',
                 ],
                 `default:Core:myTools:conceptFan:main` => [
-                        'path' => 'Core/myTools/conceptFan/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/conceptFan/',
                         'resource' => 'myTools/conceptFan',
                 ],
                 'default:Core:myTools:choice:main' => [
-                        'path' => 'Core/myTools/choice/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/choice/',
                         'resource' => 'myTools/choice',
                 ],
                 'default:Core:myTools:list:main' => [
-                        'path' => 'Core/myTools/list/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/list/',
                         'resource' => 'myTools/list',
                 ],
                 'default:Core:myTools/inAndOut:main' => [
-                        'path' => 'Core/myTools/inAndOut/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/inAndOut/',
                         'resource' => 'myTools/inAndOut',
                 ],
                 'default:Core:myTools/report:main' => [
-                        'path' => 'Core/myTools/report/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/report/',
                         'resource' => 'myTools/report',
                 ],
                 'default:Core:myTools/randomWordGenerator:main' => [
-                        'path' => 'Core/myTools/randomWordGenerator/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/randomWordGenerator/',
                         'resource' => 'myTools/randomWordGenerator',
                 ],
                 'default:Core:myTools:underConstruction' => [
@@ -172,7 +172,7 @@ return [
                         'resource' => 'myTools/stretches',
                 ],
                 'default:Core:myTools:report:main' => [
-                        'path' => 'Core/myTools/report/{instructionID}/{assignmentID}/{activityID}',
+                        'path' => 'Core/myTools/report/',
                         'resource' => 'myTools/report',
                 ],
 
@@ -185,6 +185,10 @@ return [
                         'path' => 'Core/grading',
                         'resource' => 'grading/main',
                 ],  
+                'default' => [
+                        'path' => '/Core/myTools/storeTimeOnPage/',
+                        'resource' => 'myTools/storeTimeOnPage',
+                ],
         ],
 
         'actions' => [

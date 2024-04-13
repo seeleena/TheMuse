@@ -80,7 +80,7 @@ $instruction = new StdClass();
 $tools = array();
 $lines = array();
 $i =0; 
-$siteURL = elgg_get_site_url().'_graphics/themuse/pensive.jpg';
+$siteURL = getServerURL().'_graphics/themuse/pensive.jpg';
 //add user-added instructions and tools here. 
 //this for below will be empty? since the activity would not exist.
 //so use and isset on the array.
@@ -109,7 +109,7 @@ foreach ($instructions as $instruction) {
         $toolDesc = $tool->desc;
         $toolURL = $tool->url;
         echo "<div class='btn-container'>";
-        echo "<a href='$toolURL$assignID/?activityID=$activityID&instructionID=$instructionID&stageNum=$stageNum' class='blu-btn'>$toolName</a>";
+        echo "<a href='$toolURL?assignID=$assignID&activityID=$activityID&instructionID=$instructionID&stageNum=$stageNum' class='blu-btn'>$toolName</a>";
         echo "</div>";
         //echo " </br> $toolDesc </br>  </br>";
         //

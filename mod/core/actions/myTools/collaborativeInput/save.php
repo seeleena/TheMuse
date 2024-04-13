@@ -13,9 +13,13 @@
     $chatEntriesCount = get_input('chatEntriesCount');
     $timeOnPage = get_input('timeOnPage');    
     
+    elgg_error_response($StudentELGGID);
+
     storeGroupSolutionCreativeProcess($groupID, $assignmentID, $activityID, $instructionID, $toolID, $allResponsesData, $chatData);
+     
     storeUserCPEngagement($stageNum, $assignmentID, $StudentELGGID, $toolID);
     
+     
     $answers = array();
     $decodedData = json_decode($allResponsesData, TRUE);
     error_log("decoded data:\n");
@@ -50,6 +54,8 @@
     
     storeCollaborativeInputMetrics($activityID, $assignmentID, $StudentELGGID, $instructionID, $chatEntriesCount, $timeOnPage);
     
-    $returnURL = "/Core/myCreativeProcess/activity/" . $activityID . "?assignID=" . $assignmentID . "&message=" . "Your Collaborative Input Tool has been saved.";
-    forward($returnURL);
+    $returnURL = "/Core/myCreativeProcess/activity/" . $activityID . "?assignID=" . $assignmentID;
+    elgg_ok_response('', elgg_echo('Your Collaborative Input Tool has been saved.'), null);
+    header("Location: " . elgg_get_site_url() . $returnURL);
+    exit();
 ?>

@@ -4,12 +4,11 @@
   "description": "Node.js backend for The Muse.",
   "main": "index.js",
   "dependencies": {
+    "mongodb": "^6.5.0",
+    "mongojs": "^3.1.0",
     "node-persist": "~0.0.1",
-    "socket.io": "~0.9.16",
-    "mongodb": "2.2.12",
-    "mongojs": "2.6.0"
+    "socket.io": "~0.9.16"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "node index.js",
     "start": "node server.js"

@@ -77,8 +77,11 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         height: 100px;
         overflow: auto;
     }
-    #purpose {
-
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
     }
     #purposes {
         border: 1px solid black;
@@ -223,6 +226,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
 </div>
 
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
 <script type="text/javascript" src="<?php echo getElggJSURL()?>jstree/dist/jstree.js"></script>
@@ -271,7 +275,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
          ]        
     }
     
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             socket.emit("cf_start", { room: roomKey, user: currentUser });
@@ -301,7 +305,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
                 storeGroupResponses(data.allResponses);
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType == "cf_concept_tree_updated") {
@@ -323,14 +327,14 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         });
         
         function updateConceptFanTree(newData) {
-            $("#conceptFanTree").jstree('destroy');
+            jQuery("#conceptFanTree").jstree('destroy');
             loadConceptFanTree(newData);
         }
         
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                updateCount($("#chatEntriesCount"));
-                var chatMessageBox = $(this);
+                updateCount(jQuery("#chatEntriesCount"));
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -353,63 +357,63 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         }, TIMEME_MAX_IDLE_INVOCATIONS);           
         
         function showPurposeFields() {
-            $(".conceptFanFields").hide();
-            $("#purposeFields").show();
+            jQuery(".conceptFanFields").hide();
+            jQuery("#purposeFields").show();
         }
         
         function showConceptFields() {
-            $(".conceptFanFields").hide();
-            $("#conceptFields").show();
+            jQuery(".conceptFanFields").hide();
+            jQuery("#conceptFields").show();
         }
         
         function showPossibilitiesFields() {
-            $(".conceptFanFields").hide();
-            $("#purposeFields").hide();
+            jQuery(".conceptFanFields").hide();
+            jQuery("#purposeFields").hide();
         }
         
         function getSolutions() {
-            $(".concept").each(function() {
-               $("<textarea class='solution' cols='50' rows='3'></textarea>").appendTo($(this));
-               $("<input type='button' value='Add Solution' id='btnAddSolution' class='btnAddSolution' />").appendTo($(this));
+            jQuery(".concept").each(function() {
+                jQuery("<textarea class='solution' cols='50' rows='3'></textarea>").appendTo(jQuery(this));
+                jQuery("<input type='button' value='Add Solution' id='btnAddSolution' class='btnAddSolution' />").appendTo(jQuery(this));
             });
             
-            $(".btnAddSolution").click(function() {
-                var parentContainer = $(this).parent();
+            jQuery(".btnAddSolution").click(function() {
+                var parentContainer = jQuery(this).parent();
                 var conceptIndex = parentContainer.attr("data-conceptIndex");
                 var solution = parentContainer.find(".solution:first").val();
                 socket.emit("cf_add_solution", { room: roomKey, user: currentUser, conceptIndex: conceptIndex, solution: solution });
                 alert("c/s: " + conceptIndex + "/" + solution);
             });
             
-            $("#concept").hide();
-            $("#btnAddConcept").hide();
-            $("#btnGetSolutions").hide();
-            $("#conceptFieldsTitle").hide();
-            $("#solutionFieldsTitle").show();
+            jQuery("#concept").hide();
+            jQuery("#btnAddConcept").hide();
+            jQuery("#btnGetSolutions").hide();
+            jQuery("#conceptFieldsTitle").hide();
+            jQuery("#solutionFieldsTitle").show();
         }
         
-        $("#btnAddPurpose").click(function() {
-            updateCount($("#purposeIdeasCount"));
-            var newPurpose = $("#purpose").val();
+        jQuery("#btnAddPurpose").click(function() {
+            updateCount(jQuery("#purposeIdeasCount"));
+            var newPurpose = jQuery("#purpose").val();
             socket.emit("cf_add_purpose", { room: roomKey, user: currentUser, purpose: newPurpose });
         });
 
-        $("#btnAddConcept").click(function() {
-            var newConcept = $("#concept").val();
+        jQuery("#btnAddConcept").click(function() {
+            var newConcept = jQuery("#concept").val();
             socket.emit("cf_add_concept", { room: roomKey, user: currentUser, concept: newConcept });
-            $("#concept").val("");
+            jQuery("#concept").val("");
         });
         
-        $("#btnGetSolutions").click(function() {
+        jQuery("#btnGetSolutions").click(function() {
             getSolutions();
         });
         
-        $("#btnFinishAndSave").click(function() {
-            var $form = $("#formConceptFan");
+        jQuery("#btnFinishAndSave").click(function() {
+            var $form = jQuery("#formConceptFan");
             $form.appendTo("body").submit();
         });
   
-        $("#formConceptFan").submit(function(e) {
+        jQuery("#formConceptFan").submit(function(e) {
            submittedByCurrentUser = true;
            storeChatData(currentUser, chatData);
            storePurposes();
@@ -420,12 +424,12 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         });
         
         function storePurposes() {
-            $("#allPurposesData").val(JSON.stringify(purposes));
+            jQuery("#allPurposesData").val(JSON.stringify(purposes));
         }
         
         function storeConceptFanTree() {
-            var conceptFanTreeData = $("#conceptFanTree").jstree(true).get_json('#', { 'flat': false });
-            $("#conceptFanTreeData").val(JSON.stringify(conceptFanTreeData));
+            var conceptFanTreeData = jQuery("#conceptFanTree").jstree(true).get_json('#', { 'flat': false });
+            jQuery("#conceptFanTreeData").val(JSON.stringify(conceptFanTreeData));
         }
         
         function storeLeafNodes() {
@@ -433,17 +437,17 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
             //compare leafNodes with actual nodes to find out and set whether or not the node is still a leaf.
             var index = leafNodes.length - 1;
             while (index >= 0) {
-                treeNode = $("#conceptFanTree").jstree(true).get_node(leafNodes[index].nodeID);
+                treeNode = jQuery("#conceptFanTree").jstree(true).get_node(leafNodes[index].nodeID);
                 if (treeNode.children.length !== 0) {
                     leafNodes.splice(index, 1);
                 }
                 index -= 1;
             }
-            $("#leafNodesCreatedCount").val(leafNodes.length);            
+            jQuery("#leafNodesCreatedCount").val(leafNodes.length);            
         }
         
         function loadConceptFanTree(conceptFanData) {
-            $("#conceptFanTree")
+            jQuery("#conceptFanTree")
                 .on('rename_node.jstree', function(event, data) {
                     //A node has been updated. Send the new data to node.js for distribution to all clients
                     console.log('a new node was created (rename_node.jstree) with the following data:\n' + data.old + "\n" + data.text);
@@ -453,11 +457,11 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
                     //and update the whole tree, then add back the current node as a child under its original parent.
                     //What now: figure out how to store the node that's currently being worked on. What event
                     //should we use to capture this? -- activate_node
-                    var dataToShare = $("#conceptFanTree").jstree(true).get_json('#', { 'flat': false });
+                    var dataToShare = jQuery("#conceptFanTree").jstree(true).get_json('#', { 'flat': false });
                     socket.emit("cf_update_concept_tree", { room: roomKey, user: currentUser, updatedTreeData: dataToShare });
                 })
                 .on('create_node.jstree', function(event, data) {
-                    updateCount($("#nodesCreatedCount"));
+                    updateCount(jQuery("#nodesCreatedCount"));
                     newNode = {};
                     newNode.nodeID = data.node.id;
                     newNode.isLeafNode = true;
@@ -490,8 +494,8 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
             for (var i = 0; i < serverConcepts.length; i++) {
                 concept = serverConcepts[i];
                 //if the concept isn't already present on the page, add it.
-                if ($("#concepts:first").find("div.concept[data-conceptIndex='" + i + "']").length == 0) {
-                    $("<div class='concept' data-conceptIndex='" + i + "'><p>" + concept + "</p></div>").appendTo($("#concepts"));
+                if (jQuery("#concepts:first").find("div.concept[data-conceptIndex='" + i + "']").length == 0) {
+                    jQuery("<div class='concept' data-conceptIndex='" + i + "'><p>" + concept + "</p></div>").appendTo(jQuery("#concepts"));
                 }
             }
         }
@@ -500,27 +504,27 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
             if (serverPurposes == undefined) { return; }
             purposes = serverPurposes;
             var purpose;
-            var purposesDiv = $("#purposes");
+            var purposesDiv = jQuery("#purposes");
             purposesDiv.empty();
             for (var i = 0; i < serverPurposes.length; i++) {
                 purpose = serverPurposes[i];
-                $("<p>" + purpose + "</p>").appendTo(purposesDiv);
+                jQuery("<p>" + purpose + "</p>").appendTo(purposesDiv);
             }
         }
         
         ///OLD
         
-        $("#btnAdd").click(function() {
+        jQuery("#btnAdd").click(function() {
             studentAnswer_submitted();
         });
         
         function showQuestionAndResponses() {
-            $("#questionPrompt").text(questions[currentQuestionIndex]);
+            jQuery("#questionPrompt").text(questions[currentQuestionIndex]);
             currentQuestionIndex++;
         }
         
         function studentAnswer_submitted() {
-            var answer = $("#studentAnswer").val();
+            var answer = jQuery("#studentAnswer").val();
             socket.emit("cf_message", { 
                 room: roomKey, 
                 user: currentUser, 
@@ -528,7 +532,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
                 allResponses: allResponses
             });    
             showQuestionAndResponses();
-            $("#studentAnswer").val('');
+            jQuery("#studentAnswer").val('');
         }
         
         function hasFurtherInstructions() {
@@ -537,7 +541,7 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         }
         
         function getNextInstruction() {
-            var currentInstruction = $("span.instruction.current");
+            var currentInstruction = jQuery("span.instruction.current");
             currentInstruction.removeClass("current");
             var nextInstruction = currentInstruction.next();
             return nextInstruction;
@@ -563,29 +567,29 @@ $conceptFanQuestions[2] = "Give at least one practical way or possible solution 
         }
         
         function writeResponse(groupResponse) {
-            var allResponsesContainer = $("#groupInputContainer");
+            var allResponsesContainer = jQuery("#groupInputContainer");
             var groupResponseContainer = allResponsesContainer.find("div[data-citID=" + groupResponse.citID + "]");
             groupResponseContainer.find(".response").remove();
             if (groupResponseContainer == undefined || groupResponseContainer.length == 0) {
                 //create new groupResponse div
-                var newGroupResponseContainer = $("<div class='groupResponses'></div>");
+                var newGroupResponseContainer = jQuery("<div class='groupResponses'></div>");
                 newGroupResponseContainer.attr("data-citID", groupResponse.citID);
-                var newGroupAnswerHeadingContainer = $("<div class='groupAnswerHeading'></div>");
-                var newGroupAnswerHeadingText = $("#allInstructions .instruction[data-citID=" + groupResponse.citID + "] .groupAnswerHeading").text();
+                var newGroupAnswerHeadingContainer = jQuery("<div class='groupAnswerHeading'></div>");
+                var newGroupAnswerHeadingText = jQuery("#allInstructions .instruction[data-citID=" + groupResponse.citID + "] .groupAnswerHeading").text();
                 newGroupAnswerHeadingContainer.text(newGroupAnswerHeadingText);
                 newGroupResponseContainer.append(newGroupAnswerHeadingContainer);
                 allResponsesContainer.find("div.border").append(newGroupResponseContainer);
                 groupResponseContainer = allResponsesContainer.find("div[data-citID=" + groupResponse.citID + "]");
             }
             for (var i = 0; i < groupResponse.userResponses.length; i++) {
-                var newResponseContainer = $("<div class='response'></div>");
+                var newResponseContainer = jQuery("<div class='response'></div>");
                 newResponseContainer.text(groupResponse.userResponses[i].user + ": " + groupResponse.userResponses[i].answer);
                 groupResponseContainer.append(newResponseContainer);
             }
         }
      
         function storeGroupResponses(allResponses) {
-            $("#allResponsesData").val(JSON.stringify(allResponses));
+            jQuery("#allResponsesData").val(JSON.stringify(allResponses));
         }
     });
     <?php include elgg_get_plugins_path()."Core/views/default/Core/myTools/js/chat.php"; ?>
