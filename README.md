@@ -1,7 +1,7 @@
 Welcome to The Muse Github Repository!
 ======================================
 
-##Team Members:
+#Team Members:
 	 Adrian Frection - 816027916
 	 Faith Rose - 816029963
 	 Anuradha Ramlakhan - 816030881
