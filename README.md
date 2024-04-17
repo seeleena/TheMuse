@@ -16,8 +16,8 @@ How to use the Muse:
 ===================
   1. Download Elgg
   2. Install Xampp
-	3. Upload Elgg into Xampp htdocs folder and rename as Muse
-	4. Start Xampp apache and mysql and go to localhost/Muse: http://localhost/Muse
+  3. Upload Elgg into Xampp htdocs folder and rename as Muse
+  4. Start Xampp apache and mysql and go to localhost/Muse: http://localhost/Muse
 	5. Setup Elgg on localhost/Muse
 	6. Insert core into Muse mod folder
 	7. Enable core plugin in Elgg Plugin Administration: http://localhost/Muse/admin/plugins/
