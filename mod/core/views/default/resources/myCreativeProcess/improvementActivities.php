@@ -1,5 +1,7 @@
 <?php
 
+//This page gives suggestions for improving activities
+
 include elgg_get_plugins_path()."Core/lib/utilities.php";// Enables calling of functions from utilities
 
 $title = "Creativity Factors Improvement Activities";
