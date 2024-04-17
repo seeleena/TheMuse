@@ -18,10 +18,10 @@ How to use the Muse:
   2. Install Xampp
   3. Upload Elgg into Xampp htdocs folder and rename as Muse
   4. Start Xampp apache and mysql and go to localhost/Muse: http://localhost/Muse
-	5. Setup Elgg on localhost/Muse
-	6. Insert core into Muse mod folder
-	7. Enable core plugin in Elgg Plugin Administration: http://localhost/Muse/admin/plugins/
-	8. Utlize paths documented in elgg-plugin.php
+  5. Setup Elgg on localhost/Muse
+  6. Insert core into Muse mod folder
+  7. Enable core plugin in Elgg Plugin Administration: http://localhost/Muse/admin/plugins/
+  8. Utlize paths documented in elgg-plugin.php
 
 ## Resources:
 	Xampp download: https://www.apachefriends.org/download.html
@@ -44,15 +44,14 @@ current pedagogical requirements.
 
 ## Objectives:
 
-● Enhance overall system performance and responsiveness.
-● Improve the maintainability and readability of the codebase.
-● Upgrade dependencies and frameworks to current versions.
-● Evaluate and potentially refine existing features to align with current pedagogical
-requirements.
-● Ensure the scalability and future-proofing of The Muse.
+	● Enhance overall system performance and responsiveness.
+	● Improve the maintainability and readability of the codebase.
+	● Upgrade dependencies and frameworks to current versions.
+	● Evaluate and potentially refine existing features to align with current pedagogical requirements.
+	● Ensure the scalability and future-proofing of The Muse.
 
 ## Deliverables:
-● Refactored and modernized codebase.
-● Updated documentation reflecting the changes made.
-● Updated dependencies and frameworks.
-● Evaluation report on existing features with recommendations for refinement.
+	● Refactored and modernized codebase.
+	● Updated documentation reflecting the changes made.
+	● Updated dependencies and frameworks.
+	● Evaluation report on existing features with recommendations for refinement.
