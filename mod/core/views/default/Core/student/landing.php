@@ -1,9 +1,10 @@
+//This is the view for the student landing page
 <?php
-include elgg_get_plugins_path()."Core/lib/utilities.php"; 
-$user = elgg_get_logged_in_user_entity();
+include elgg_get_plugins_path()."Core/lib/utilities.php"; //This enables the relevant functions that is used for this student landing page to be called from utilities
+$user = elgg_get_logged_in_user_entity();//Verifies user logged in
 ?>
 
-
+//Description of The Muse outlined for students
 <div class="elgg-main elgg-body">
     <ul class="elgg-menu elgg-breadcrumbs"><li>Home</li></ul>
     <div class="elgg-head clearfix">
@@ -17,7 +18,8 @@ $user = elgg_get_logged_in_user_entity();
         Muse, the more useful it will become to you and your classmates.
         </p>
      </blockquote > 
-    
+	
+    // CSS imported from old codebase
     <div class="elgg-head clearfix">
         <h3 class="elgg-heading-main">Things you should know</h3>
     </div>
@@ -552,8 +554,10 @@ padding-right: 15px;
         <div id="wrapper-logo">
             <div id="menusAndFeatures">
                 <h4 class="myheader">Menus & Features:</h4>
-
-                <ul class="list">
+/*************************************************/		    
+//Further detailed instructions added for students
+/*************************************************/
+		    <ul class="list">
                     <li>
                         The menu bar at the top left consisting of "Home, My Assignments, My Group,
                         My Creative Process and Tools" is where you will find everything pertaining to your
