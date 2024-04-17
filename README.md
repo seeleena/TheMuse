@@ -12,8 +12,8 @@ Welcome to The Muse Github Repository!
 The Muse social networking application, developed in 2016, assists students with their creative endeavors during coursework projects and assignments by recording the creative process in real-time, a departure from past methods. It emphasizes early-stage creativity development, supporting research into tertiary-level learning processes. Our project is focused on revitalizing the original code	base, updating dependencies and restructuring the code for clarity and ease of maintenance.  This modernization not only improves Muse's functionality but also paves the way for future development.
 
 
-##How to use the Muse:
-
+How to use the Muse:
+===================
   1. Download Elgg
   2. Install Xampp
 	3. Upload Elgg into Xampp htdocs folder and rename as Muse
