@@ -19,7 +19,8 @@ $activityID   = $vars['activityID'];
 $instructionID= $vars['instructionID'];
 $groupID      = $vars['groupID'];
 $groupMembers = $vars['groupMembers'];
-$nodeServer   = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser  = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey   = $vars['sessionKey'];
@@ -30,7 +31,12 @@ $_SESSION['assignmentID'] = $assignmentID;
 $_SESSION['activityID'] = $activityID;
 ?>
 <style>
-    
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
+    }
     #chatContainer div.border {
         border: 1px solid black;
         /*min-height: 50px;*/
@@ -99,6 +105,7 @@ $_SESSION['activityID'] = $activityID;
     $form_body .= elgg_view('input/hidden', array('id' => 'assignmentID', 'name' => 'assignmentID', 'value' => $assignmentID));
     $form_body .= elgg_view('input/hidden', array('id' => 'chatData', 'name' => 'chatData'));
     $form_body .= elgg_view('input/hidden', array('id' => 'wordsGeneratedCount', 'name' => 'wordsGeneratedCount', 'value' => 1));
+    $form_body .= elgg_view('input/hidden', array('id' => 'word', 'name' => 'word', 'value' => $vars['randomWord']));
     $form_body .= elgg_view('input/hidden', array('id' => 'timeOnPage', 'name' => 'timeOnPage', 'value' => 0));
     $form_body .= elgg_view('input/submit', array('value'=>'Finish and Save', 'id' => 'btnFinishAndSave'));
     echo elgg_view('input/form', array(
@@ -109,9 +116,12 @@ $_SESSION['activityID'] = $activityID;
     ));
     ?>
 </div>  
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <script type="text/javascript">
     var ENTER_KEY_CODE = 13;
     var currentUser = "<?php echo $currentUser->name; ?>";
@@ -171,7 +181,7 @@ $_SESSION['activityID'] = $activityID;
         return succeed;
     }
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             socket.emit("rwg_start", { room: roomKey, user: currentUser });
@@ -185,7 +195,7 @@ $_SESSION['activityID'] = $activityID;
                 }
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "rwg_form_finished") {
@@ -198,9 +208,9 @@ $_SESSION['activityID'] = $activityID;
             }
         });
        
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                var chatMessageBox = $(this);
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -209,16 +219,16 @@ $_SESSION['activityID'] = $activityID;
         });
         
         function storeRandomWordGeneratorData() {
-//            var wordCount = firepad.getText().trim().split(/\s+/).length;
-//            $("#wordCount").val(wordCount);
+            //var wordCount = firepad.getText().trim().split(/\s+/).length;
+            //jQuery("#wordCount").val(wordCount);
         }
         
-        $("#rwgContainer").click(function() {
+        jQuery("#rwgContainer").click(function() {
             copyToClipboard(this);
-            elgg.system_message("'" + $(this).text() + "' copied to clipboard.");
+            <?php elgg_ok_response("", ($vars['randomWord'] . " copied to clipboard."), null); ?>
         });
         
-        $("#rwgForm").submit(function() {
+        jQuery("#rwgForm").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storeRandomWordGeneratorData();
@@ -227,15 +237,16 @@ $_SESSION['activityID'] = $activityID;
             return true;            
         });
         
-        $(window).unload(function() {
+        jQuery(window).on('beforeunload', function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
-            elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
-                success: function(result, success, xhr) {
-
-                } 
+            var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                $.get(url, function(data, status) {
+                    console.log("Data: " + data + "\nStatus: " + status);
+                });
+                console.log('User left. Time on page: ' + timeSpentOnPage + ' seconds.');
+                TimeMe.resetAllRecordedPageTimes();  
             });  
         });
-    });
     
     <?php include elgg_get_plugins_path()."Core/views/default/Core/myTools/js/chat.php"; ?>
 </script>

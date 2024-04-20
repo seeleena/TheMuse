@@ -1,20 +1,37 @@
 <?php
+    // Include utilities from the Core plugin
+    include elgg_get_plugins_path() . "Core/lib/utilities.php";
 
-include elgg_get_plugins_path()."Core/lib/utilities.php";
+    // Set the title of the page
+    $title = "Assignment Grouping";
 
-$title = "Assignment Grouping";
-$vars = array();
-$vars['user'] = elgg_get_page_owner_entity();
+    // Initialize an array to hold variables
+    $vars = array();
 
-$vars['courseCodes'] = getCourseCodes();
-$vars['assignments'] = getAssignments();
+    // Get the logged in user entity and add it to the variables array
+    $vars['user'] = elgg_get_logged_in_user_entity();
 
-$userEntities = array();
-$userEntities = getUserEntities();
-$vars['userEntities'] = $userEntities;
+    // Get the course codes and assignments and add them to the variables array
+    $vars['courseCodes'] = getCourseCodes();
+    $vars['assignments'] = getAssignments();
 
-$content = elgg_view('Core/assignments/grouping', $vars);
-$vars['content'] = $content;
-$body = elgg_view_layout('one_sidebar', $vars);
-echo elgg_view_page($title, $body);
+    // Get the user entities and add them to the variables array
+    $userEntities = array();
+    $userEntities = getUserEntities();
+    $vars['userEntities'] = $userEntities;
+
+    // Generate the content of the page by rendering the 'Core/assignments/grouping' view
+    // The second argument to elgg_view() is an array of variables to pass to the view
+    $content = elgg_view('Core/assignments/grouping', $vars);
+
+    // Add the content to the variables array
+    $vars['content'] = $content;
+
+    // Generate the layout of the page by rendering the 'one_sidebar' layout
+    // The second argument to elgg_view_layout() is an array of variables to pass to the layout
+    $body = elgg_view_layout('one_sidebar', $vars);
+
+    // Output the page by rendering the 'elgg_view_page' view
+    // The first argument is the title of the page, and the second argument is the body of the page
+    echo elgg_view_page($title, $body);
 ?>

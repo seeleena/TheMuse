@@ -1,16 +1,19 @@
 <?php
 $userid = $vars['owner'];
+$user = elgg_get_logged_in_user_guid();
 $suggestions = $vars['suggestions'];
 
 //$cpDetails = array();
 $cp = new StdClass();
 $cp = $vars['cp'];
-
+$cpID = $vars['cpID'];
 $cpName = $cp->name;
 $cpOverview = $cp->overview;
 $stages = array();
 $stages = $cp->stages;
+$stageNum = $vars['stageNum'];
 $key = new stdClass();
+
 
 
 
@@ -19,7 +22,7 @@ $_SESSION['currentAssignID'] = $assignID;
 
 $cpID = getCP($assignID);
 
-//setUpAssessmentFile($userid, $assignID);
+setUpAssessmentFile($user, $assignID);
 
 $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
 ?>
@@ -32,20 +35,19 @@ $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
     <style>
         .back-to-top {
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             right: 20px;
             display: none;
         }
         .bubble {
             position: relative;
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 5px;
             background: #f9f9f9;
             border: 1px solid #e5e5e5;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
-            border-radius: 5px;
+            border-radius: 10px;
         }
         .rectangle {
             position: relative;
@@ -53,7 +55,7 @@ $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
             border: 1px solid #e5e5e5;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
-            border-radius: 5px;
+            border-radius: 15px;
             padding: 10px;
             margin: 10px 0;
         }
@@ -64,8 +66,38 @@ $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
             width: 0;
             height: 0;
             border-top: 10px solid transparent;
-            border-right: 20px solid #f9f9f9;
+            border-right: 20px solid #34b4db;
             border-bottom: 10px solid transparent;
+        }
+        .couponcode-sugg {
+            position: relative;
+            background: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 15px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .activityHeader {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .a-items {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: normal;
+            padding: 10px 0px;
+            margin-left: 15px;
+        }
+        .c-item {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: normal;
+            padding: 10px 0px;
+            margin-left: 10px;
         }
     </style>
     <blockquote>
@@ -81,11 +113,15 @@ $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
     </blockquote>
 
 <?php if (isset($suggestions)) { ?>
-    <div class='bubble'> 
-    <div class='rectangle'><div class='couponcode'><h2>Suggested Activities <img src='<?php echo $siteURL?>' width='20px' height='20px' class='imgStyle'/></h2><span class='coupontooltip'>Suggested activities, prioritized</span></div>
-    </div>
+    <div class='bubble' style = "margin-bottom: 50px;"> 
+    <a href='<?php echo getServerURL() . "Core/myCreativeProcess/improvementActivities/$cpID?assignID=$assignID&stageNum=$stageNum" ?>' >
+    <div class='couponcode-sugg'>
+        <!-- <h2>Suggested Activities <img src='<?php echo $siteURL?>' width='20px' height='20px' class='imgStyle'/></h2> -->
+        <h2>Suggested Activities </h2>
+    </div></a>
+
     <div class='triangle-l'></div>
-    <div class='triangle-r'></div><br/><br/>
+    <div class='triangle-r'></div>
         <?php 
         if (empty($suggestions)) {
             echo "<div id='nosuggestions'>There are no suggestions available at this time.</div>";
@@ -109,10 +145,11 @@ foreach($stages as $key) {
     $desc = $key->desc;
     $stageNum = $key->num;
         echo "<div class='bubble'> 
-        <div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name <img src='$siteURL' width='20px' height='20px' class='imgStyle'/></h2><span class='coupontooltip'>$desc</span></div>
+        <!--<div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name <img src='$siteURL' width='20px' height='20px' class='imgStyle'/></h2><span class='coupontooltip'>$desc</span></div> -->
+        <div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name</h2><span class='coupontooltip'>$desc</span></div>
         </div>
         <div class='triangle-l'></div>
-        <div class='triangle-r'></div><br/><br/>";
+        <div class='triangle-r'></div>";
     
     $activities = array();
     $activities = $key->activities;
@@ -124,14 +161,14 @@ foreach($stages as $key) {
         $activity = new stdClass();
         
         echo "<div class='btn-container'>";
-        echo "<a href='" . getServerURL() . "Core/myCreativeProcess/activity/$aID?assignID=$assignID&stageNum=$stageNum' class='blu-btn'>$activityShortDesc</a>";
+        echo "<a class='a-items' href='" . getServerURL() . "Core/myCreativeProcess/activity/$aID?assignID=$assignID&stageNum=$stageNum' class='blu-btn'>$activityShortDesc</a>";
         echo "</div>";
     }
     $key = new stdClass();
     
     //add button for user here: "create my own activity:
     echo "<div class='btn-container'>";
-    echo "<a href='" . getServerURL() . "Core/myCreativeProcess/newUserActivity/?aID=$aID&assignID=$assignID&userID=$userid&cpID=$cpID&stageNum=$stageNum' class='green-button'>Create My Own Activity</a>";
+    echo "<a class='c-item' href='" . getServerURL() . "Core/myCreativeProcess/newUserActivity/$aID?aID=$aID&assignID=$assignID&userID=$user&cpID=$cpID&stageNum=$stageNum' class='green-button'>Create My Own Activity</a>";
     //echo "<input type='button' class='grn-btn addUserActivity' value='Create My Own Activity'/>";
     echo "</div>";
     //add user-added activities here
@@ -148,7 +185,7 @@ foreach($stages as $key) {
         $studentCreatedActivity = new stdClass();
         
         echo "<div class='btn-container'>";
-        echo "<a href='" . getServerURL() . "Core/myCreativeProcess/studentCreatedActivity/$stuAID?assignID=$assignID' class='blu-btn'>$shortDesc</a>";
+        echo "<a class='a-items' href='" . getServerURL() . "Core/myCreativeProcess/studentCreatedActivity/$stuAID?assignID=$assignID' class='blu-btn'>$shortDesc</a>";
         echo "</div>";
     }
     
@@ -157,24 +194,25 @@ foreach($stages as $key) {
     echo "<div class='bubble'>
         <div class='rectangle'><h2>Final Stage: Upload your solution.</h2></div>
         <div class='triangle-l'></div>
-        <div class='triangle-r'></div><br/><br/>";
+        <div class='triangle-r'></div>";
     echo "<div class='btn-container'>";
     echo "<p>Put together all documents and files that must be submitted as part of your assignment 
-        and create a .zip file containing them.</p>";
-    echo "<a href='" . getServerURL() . "Core/myCreativeProcess/uploadSolution/$userid?assignID=$assignID' class='blu-btn'>Upload zipped solution</a>";
-    echo "</div>";
-    echo "</div><br/><br/>";
+        and create a .zip file containing them.</p><br/>";
+    echo "<a href='" . getServerURL() . "Core/myCreativeProcess/uploadSolution/$assignID?assignID=$assignID' class='blu-btn'>Upload zipped solution</a><br/>";
+    echo "<br/></div>";
+    echo "</div><br/>";
 ?>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $(".couponcode h2 img.imgStyle").hover(function() {
-            var icon = $(this);
+    jQuery(document).ready(function() {
+        jQuery(".couponcode h2 img.imgStyle").hover(function() {
+            var icon = jQuery(this);
             var tooltip = icon.parent().next();
             tooltip.show();
         }, 
         function() {
-            var icon = $(this);
+            var icon = jQuery(this);
             var tooltip = icon.parent().next();
             tooltip.hide();
         });

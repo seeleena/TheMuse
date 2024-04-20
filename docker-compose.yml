@@ -1,3 +1,4 @@
+
 version: '3.8'
 services:
   elgg:
@@ -9,12 +10,21 @@ services:
     depends_on:
       mysql_elgg_db:
         condition: service_healthy
+     # mysql_muse_db:
+    #    condition: service_healthy
     env_file:
       - path: ./elgg.env
     volumes:
       - elgg_data:/data/elgg_data:rw
       - ./elgg_config_container:/var/www/html/elgg_config
-      - ./sql:/docker-entrypoint-initdb.d:rw
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+
   mysql_elgg_db:
     hostname: mysql_elgg_db
     image: mysql:8.3
@@ -27,21 +37,26 @@ services:
       timeout: 20s
       retries: 10
     volumes:
-      - elgg_db_data:/var/lib/mysql:rw
+      - elgg_db_data:/var/lib/mysql
 
-  # nodejs:
-  #   image: node:10
-  #   command: npm test
-  #   depends_on:
-  #     - elgg
-
-  # mongodb:
-  #   image: mongo:latest
+  # mysql_muse_db:
+  #   hostname: mysql_muse_db
+  #   image: mysql:8.3
   #   ports:
-  #     - "27017:27017"
-  #   depends_on:
-  #     - nodejs
+  #     - '3307:3307'
+  #   env_file:
+  #     - path: ./muse.env
+  #   healthcheck:
+  #     test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+  #     timeout: 20s
+  #     retries: 10
+  #   volumes:
+  #     - muse_db_data:/var/lib/mysql
+
 volumes:
   # Upload folder for user uploads etc
   elgg_data: 
   elgg_db_data: 
+  muse_data:
+  #muse_db_data:
+  mongodb_data:

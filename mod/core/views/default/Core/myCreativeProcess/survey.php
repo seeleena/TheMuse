@@ -42,6 +42,18 @@
     .elgg-button-submit.active {
         display: none;
     }
+    .tableHeaderText {
+        font-weight: bold;
+        padding: 8px;
+    }
+    .elgg-main {
+        background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+    }
+    
+    
 </style>
 <link rel="stylesheet" type="text/css" href="<?php echo getElggJSURL()?>common/rating.css" />
 <script type="text/javascript" src="<?php echo getElggJSURL()?>common/rating.js"></script>
@@ -227,46 +239,47 @@ function getRatingsControl($type, $id) {
 
 ?>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $(".ratingContainer").rating();
+    jQuery(document).ready(function() {
+        jQuery(".ratingContainer").rating();
     });
- /*   $(document).ready(function() {
+    jQuery(document).ready(function() {
         var assignmentID = <?php echo $assignmentID; ?>;
-        $("#assignID").val(assignmentID);
-        $("#instruction1Submit").click(function() {
-            $("#instructionContents1").removeClass('active');
-            $("#instruction1").removeClass('active');
+        jQuery("#assignID").val(assignmentID);
+        jQuery("#instruction1Submit").click(function() {
+            jQuery("#instructionContents1").removeClass('active');
+            jQuery("#instruction1").removeClass('active');
             buildSectionWeightingTable("creativeSolution");
-            $("#creativeSolutionWeightingDiv").addClass('active');
-            $("#btnSaveSectionWeightings").addClass("active");
-            $("#instruction2").addClass('active');
-            $("input.headingAssessment").change(setInputMaxTo100);
+            jQuery("#creativeSolutionWeightingDiv").addClass('active');
+            jQuery("#btnSaveSectionWeightings").addClass("active");
+            jQuery("#instruction2").addClass('active');
+            jQuery("input.headingAssessment").change(setInputMaxTo100);
         });
         
-        $("#btnSaveSectionWeightings").click(function() {
-            $("#instruction2").removeClass('active');
-            $("#instruction3").addClass('active');
-            $("input.headingAssessment").prop('readonly', true);
+        jQuery("#btnSaveSectionWeightings").click(function() {
+            jQuery("#instruction2").removeClass('active');
+            jQuery("#instruction3").addClass('active');
+            jQuery("input.headingAssessment").prop('readonly', true);
             buildCriteriaWeightingTable("creativeSolution");
-            $("#btnSaveSectionWeightings").removeClass('active');
-            $("#btnSaveAssessmentWeightings").addClass('active');
+            jQuery("#btnSaveSectionWeightings").removeClass('active');
+            jQuery("#btnSaveAssessmentWeightings").addClass('active');
         });
         
         function buildCriteriaWeightingTable(weightingTable) {
             var checkedCriteria = getCheckedCriteria(weightingTable);
             var currentHeaderID, currentCriteria;
             for (var i = 0; i < checkedCriteria.length; i++) {
-                currentCriteria = $(checkedCriteria[i]);
+                currentCriteria = jQuery(checkedCriteria[i]);
                 currentHeaderID = currentCriteria.data('headerid');
                 insertCriteriaIntoSection(currentCriteria, currentHeaderID, weightingTable);
             }
-            $(".numbersOnly").keypress(setNumbersOnly);            
-            $("input.criteriaAssessment").change(setInputMaxTo100);  
+            jQuery(".numbersOnly").keypress(setNumbersOnly);            
+            jQuery("input.criteriaAssessment").change(setInputMaxTo100);  
         }
         
         function setInputMaxTo100() {
-            var currentInputBox = $(this);
+            var currentInputBox = jQuery(this);
             var allInputsForSection = getAllInputsForSection(currentInputBox);
             allInputsForSection.removeClass("weightingError");
             var totalForSection = getTotalForSection(allInputsForSection);
@@ -279,11 +292,11 @@ function getRatingsControl($type, $id) {
             var headingID = currentInputBox.data("headingid");
             var inputType = getInputType(currentInputBox);
             if (inputType == "criteriaAssessment") {
-                return $("input." + inputType + "[data-headingid='" + headingID + "']");
+                return jQuery("input." + inputType + "[data-headingid='" + headingID + "']");
             }
             else {
                 var criteriaType = currentInputBox.data("criteriatype");
-                return $("input.headingAssessment[data-criteriatype='" + criteriaType + "']");
+                return jQuery("input.headingAssessment[data-criteriatype='" + criteriaType + "']");
             }
         }
         
@@ -297,7 +310,7 @@ function getRatingsControl($type, $id) {
         }
         
         function insertCriteriaIntoSection(currentCriteria, currentHeaderID, weightingTable) {
-            var currentHeaderSection = $("tr.headingAssessment[data-headingid='" + currentHeaderID + "'][data-criteriatype='" + weightingTable + "']:first");
+            var currentHeaderSection = jQuery("tr.headingAssessment[data-headingid='" + currentHeaderID + "'][data-criteriatype='" + weightingTable + "']:first");
             var criteriaTitle = currentCriteria.parent().prevAll("td.assessmentCriteria:first").text();
             var criteriaID = currentCriteria.attr("id");
             currentHeaderSection.after("<tr class='headingAssessment' data-headingID='" + currentHeaderID + "' data-criteriaType='" 
@@ -319,24 +332,24 @@ function getRatingsControl($type, $id) {
             var currentHeaderID, currentCriteria;
             var selectedHeaders = [];
             for (var i = 0; i < checkedCriteria.length; i++) {
-                currentCriteria = $(checkedCriteria[i]);
+                currentCriteria = jQuery(checkedCriteria[i]);
                 currentHeaderID = currentCriteria.data('headerid');
-                if ($.inArray(currentHeaderID, selectedHeaders) === -1) {
+                if (jQuery.inArray(currentHeaderID, selectedHeaders) === -1) {
                     selectedHeaders.push(currentHeaderID);
                 }
             }
-            var weightingTableRowInsertionArea = $("#" + weightingTable + "WeightingTable > tbody:first");
+            var weightingTableRowInsertionArea = jQuery("#" + weightingTable + "WeightingTable > tbody:first");
             var headingTitle, row;
             for (var i = 0; i < selectedHeaders.length; i++) {    
                 headingTitle = getHeadingTitle(selectedHeaders[i]);
-                row = $("<tr class='headingAssessment' data-headingID='" + selectedHeaders[i] + 
+                row = jQuery("<tr class='headingAssessment' data-headingID='" + selectedHeaders[i] + 
                         "' data-criteriaType='" + weightingTable + "'><td>" + headingTitle + 
                         "</td><td><input name='" + selectedHeaders[i] + "' type='text' class='headingAssessment numbersOnly' data-criteriaType='" 
                         + weightingTable + "' data-headingID='" + selectedHeaders[i] 
                         + "' id='" + selectedHeaders[i] + "'/></td></tr>");//added id
                 weightingTableRowInsertionArea.append(row);
             }
-            $(".numbersOnly").keypress(setNumbersOnly);
+            jQuery(".numbersOnly").keypress(setNumbersOnly);
             //set val to 100 if only 1 item.
             if (selectedHeaders.length == 1) {
                 row.find("input:first").val("100").prop('readonly', true);
@@ -351,109 +364,11 @@ function getRatingsControl($type, $id) {
         }
 
         function getHeadingTitle(headingID) {
-             return $("td[data-headingid='" + headingID + "']").data('headingtitle');
+             return jQuery("td[data-headingid='" + headingID + "']").data('headingtitle');
         }
        
         function getCheckedCriteria(weightingTable) {
-            return $("input[type='checkbox']").filter("[data-criteriaType='" + weightingTable + "']:checked");
+            return jQuery("input[type='checkbox']").filter("[data-criteriaType='" + weightingTable + "']:checked");
         }
-    });*/
+    });
 </script>
-
-<?php
-//////////////////////////***************************/////////////////
-////This section can be a second page of the survey. Or it can be a section separate in the same table.
-////There are 10 questions and there are no criteria IDs or headings.
-//echo "<tr>
-//                <td class='criteriaHeading' data-headingID='' data-headingTitle=''>SECTION 8: Creative Meta-Cognition (CMC) </td>
-//                <td class='criteriaHeading checkBoxMiddle'></td>
-//            </tr>
-//            ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Self-efficacy/Confidence - Please rate your confidence level on being creative.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Understanding costs and benefits of creativity - Please rate your understanding of weighing the costs and benefits of being creative.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Understanding the time and place for creativity - 
-//Please rate your understanding of being creative, only at the relevant time and place. </p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Having clarity of task constraints and expectations - 
-//Please rate your general tendency to clarify task constraints and expectations.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Ability to play and explore - Please rate your ability to play and explore an idea that you have had.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Collaborative ability & social expertise / Expressiveness - 
-//Please rate your ability to communicate and express yourself in a social context.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Active engagement - Please rate your ability to actively engage in assignments/projects, i.e., your ability to interact with the materials to gain a deeper understanding of the concepts.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Internal motivation - Please rate your level of internal motivation to be creative in your assignments/projects.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>External motivation - Please rate your level of external motivation to be creative in your assignments/projects.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Ability to give critical feedback - Please rate your ability to constructively and critically evaluate your peers’ creative work.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//echo "<tr>
-//            <td class='assessmentCriteria' class='criteriaDescription'>
-//                <p>Ability to receive critical feedback -Please rate your ability to productively receive evaluation from your peers on your creative work.</p> 
-//            </td>
-//            <td class='checkBoxMiddle'><input type='checkbox' data-headerID='$crit->Hid' data-criteriaType='creativeSolution' id='$criteriaID'></td>
-//        </tr>
-//        ";
-//////////////////////////*************************///////////////////
-//echo "
-//        <tr>
-//            <td colspan='2'><input type='submit' class='elgg-button elgg-button-submit' id='surveySubmit' value='Finish and Save' /></td>
-//        </tr>
-//    </table>
-//</div>";
-?>

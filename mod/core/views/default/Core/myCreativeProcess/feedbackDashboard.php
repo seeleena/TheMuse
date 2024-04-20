@@ -46,7 +46,7 @@ $creativityFactors = $vars['creativityFactors'];
     .elgg-main {
         margin-bottom: 20px;
     }
-    
+
     
 </style>
 <h1>Feedback</h1>
@@ -60,30 +60,26 @@ $creativityFactors = $vars['creativityFactors'];
         <p>Furthermore, there are practice activities and hints available to you should your score fall below 40%. Click on the relevant box for these helpful activities.</p>
     </blockquote>
     <div class="dashboard">
-        <?php
-        $improvementURL = getServerURL() . "/Core/myCreativeProcess/improvementActivities/";
-        foreach ($creativityFactors as $factor) {
-        ?>
-        <div class="tile">
-            <a href='<?php echo $improvementURL . $factor->id?>'>
-                <div class="tile-title" title="Your score on <?php echo $factor->name?>"><?php echo $factor->rating?>%</div>
-                <div class="tile-subtitle" title="Class Average for <?php echo $factor->name?>"><?php echo $factor->classAverage?>%</div>
-                <div class="tile-text"><?php echo $factor->name?></div>
-            </a>
-        </div>        
-        <?php
-        }
-        ?>
-        
-<?php
-/*
-        <div class="tile">
-            <div class="tile-title" title="Your score on <?php echo $factor->name?>"><a href='<?php echo $improvementURL . $factor->id?>'><?php echo $factor->rating?>%</a></div>
-            <div class="tile-subtitle" title="Class Average for <?php echo $factor->name?>"><?php echo $factor->classAverage?>%</div>
-            <div class="tile-text"><?php echo $factor->name?></div>
-        </div>       
- */
- 
+    <?php
+    // Define the URL for improvement activities
+    $improvementURL = getServerURL() . "/Core/myCreativeProcess/improvementActivities/";
+
+    // Loop through each creativity factor
+    foreach ($creativityFactors as $factor) {
+        // Start a new tile
+        echo "<div class='tile'>";
+        // Create a link to the improvement activity for this factor
+        echo "<a href='{$improvementURL}{$factor->id}'>";
+        // Display the user's score for this factor
+        echo "<div class='tile-title' title='Your score on {$factor->name}'>{$factor->rating}%</div>";
+        // Display the class average for this factor
+        echo "<div class='tile-subtitle' title='Class Average for {$factor->name}'>{$factor->classAverage}%</div>";
+        // Display the name of this factor
+        echo "<div class='tile-text'>{$factor->name}</div>";
+        // End the link and the tile
+        echo "</a></div>";
+    }
 ?>
-    </div>
 </div>
+</div>
+

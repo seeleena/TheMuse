@@ -6,10 +6,31 @@ $user = elgg_get_logged_in_user_entity();
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">Welcome to the Muse v2, <?php echo $user->username; ?>.</h2>
     </div>
+    <style>
+        .elgg-table {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        .elgg-table a {
+            text-decoration: none;
+            color: #000;
+        }
+        .elgg-table a:hover {
+            text-decoration: underline;
+        }
+        .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
     <blockquote>
     <p>
         Welcome! You can manage your course using the links below.
-        The Assignment Grading menu at the top right of the page gives you access to
+        The Assignment Grading menu at the top of the page gives you access to
         all assignments submitted.
     </p>
 </blockquote>

@@ -35,7 +35,8 @@ $activityID   = $vars['activityID'];
 $instructionID= $vars['instructionID'];
 $groupID      = $vars['groupID'];
 $groupMembers = $vars['groupMembers'];
-$nodeServer   = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser  = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey   = $vars['sessionKey'];
@@ -47,7 +48,12 @@ $_SESSION['assignmentID'] = $assignmentID;
 $_SESSION['activityID'] = $activityID;
 ?>
 <style>
-    
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
+    }
     .firepad {
       width: 700px;
       height: 450px;
@@ -136,6 +142,7 @@ $_SESSION['activityID'] = $activityID;
     ));
     ?>
 </div>  
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -149,7 +156,7 @@ $_SESSION['activityID'] = $activityID;
     var listItems = [];
     var firepad = null;
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         
         var firepadRef = new Firebase('<?php echo $reportURL ?>');
         var codeMirror = CodeMirror(document.getElementById('firepad'), { lineWrapping: true });
@@ -169,7 +176,7 @@ $_SESSION['activityID'] = $activityID;
                 }
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "report_form_finished") {
@@ -182,10 +189,10 @@ $_SESSION['activityID'] = $activityID;
             }
         });
        
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                updateCount($("#chatEntriesCount"));
-                var chatMessageBox = $(this);
+                updateCount(jQuery("#chatEntriesCount"));
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -195,10 +202,10 @@ $_SESSION['activityID'] = $activityID;
         
         function storeReportData() {
             var wordCount = firepad.getText().trim().split(/\s+/).length;
-            $("#wordCount").val(wordCount);
+            jQuery("#wordCount").val(wordCount);
         }
         
-        $("#reportForm").submit(function() {
+        jQuery("#reportForm").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storeReportData();
@@ -207,13 +214,14 @@ $_SESSION['activityID'] = $activityID;
             return true;            
         });
         
-        $(window).unload(function() {
+        jQuery(window).on('beforeunload', function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
-            elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
-                success: function(result, success, xhr) {
-
-                } 
-            });  
+            var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                $.get(url, function(data, status) {
+                    console.log("Data: " + data + "\nStatus: " + status);
+                });
+                console.log('User left. Time on page: ' + timeSpentOnPage + ' seconds.');
+                TimeMe.resetAllRecordedPageTimes();  
         });
     });
     

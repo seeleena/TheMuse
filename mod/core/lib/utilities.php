@@ -4,8 +4,8 @@
 include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
 
 function getServerURL() {
-    return "http://diana.shripat.com/themuse/";
-    //return "http://localhost/Muse/";
+    //return "http://diana.shripat.com/themuse/";
+    return "http://localhost/Muse/";
 }
 
 function getApplicationName() {
@@ -44,6 +44,7 @@ function getAll($studentID) {
             $assignment['course'] = $courseCode;
             $assignment['assignID'] = $row2['Assignment_ID'];
             $assignment['number'] = $row2['Number'];
+            $assignment['description'] = $row2['Description'];
             $assignments[] = $assignment;
         }
     }
@@ -94,6 +95,38 @@ function getCourseCodes () {
     return $codes;
 }
 
+function getStudentCourses ($studentID) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $coursesID = array();
+    $res = $mysqli->query("SELECT CourseRunID from courselist WHERE Student_ID = '$studentID'");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $courses[] =  $row['CourseRunID'];
+    }
+    $course = array();
+    foreach ($courses as $courseID) {
+        $res = $mysqli->query("SELECT Code from courserun WHERE CourseRunID = '$courseID'");
+        $res->data_seek(0);
+        while ($row = $res->fetch_assoc()) {
+            $course[] =  $row['Code'];
+        }
+    }
+    return $course;
+}
+
+function getRunCourseCodes () {
+    $mysqli = get_CoreDB_link("mysqli");
+    $codes = array();
+    $res = $mysqli->query("SELECT Code from courserun WHERE IsArchived = 0");
+    $res->data_seek(0);
+    while ($row = $res->fetch_assoc()) {
+        $codes[] =  $row['Code'];
+    }
+    sort($codes);
+    return $codes;
+
+}
+
 function getDomain () {
     $mysqli = get_CoreDB_link("mysqli");
     $domain = array();
@@ -122,7 +155,7 @@ function getQuestionTypes () {
 function getAssignments() {
     $mysqli = get_CoreDB_link("mysqli");
     $assignments = array();
-    $res = $mysqli->query("SELECT Instructions FROM assignment");
+    $res = $mysqli->query("SELECT Instructions, Assignment_ID FROM assignment");
     $res->data_seek(0);
     while ($row = $res->fetch_assoc()) {
         $assignments[] = $row['Instructions'];
@@ -162,16 +195,10 @@ function getStudent($elggID) {
 
 function getCourseRunByCode($courseCode) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID, Code, Instructor_ID from courserun WHERE Code = ? AND IsArchived = 0");
-    $getCourseRunStatement->bind_param('i', $courseCode);
+    $getCourseRunStatement = $mysqli->prepare("SELECT CourseRunID from courserun WHERE Code = ? AND IsArchived = 0");
+    $getCourseRunStatement->bind_param('s', $courseCode);
     $getCourseRunStatement->execute();
-    $getCourseRunStatement->bind_result($courseRunID, $code, $instructorID);
-    while ($getCourseRuntatement->fetch()) {
-        $courseRun = new StdClass;
-        $courseRun->id = $courseRunID;
-        $courseRun->code = $code;
-        $courseRun->instructorID = $instructorID;
-    }
+    $getCourseRunStatement->bind_result($courseRunID);
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
     return $courseRunID;
@@ -191,6 +218,7 @@ function getCourseRunByID($coureRunID) {
     }
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
+
     return $courseRunID;
 }
 
@@ -203,6 +231,22 @@ function getAssignmentIDbyCourseRun($courseRunID, $assignNumber){
     $getCourseRunStatement->fetch();
     $getCourseRunStatement->close();
     return $assignID;
+}
+
+function getAssignmentsByCourseCode($courseCode) {
+    $mysqli = get_CoreDB_link("mysqli");
+    $courseRunID = getCourseRunByCode($courseCode);
+    $assignments = array();
+    $getAssignmentsStatement = $mysqli->prepare("SELECT Number, Assignment_ID from assignment WHERE CourseRunID = ?");
+    $getAssignmentsStatement->bind_param('i', $courseRunID);
+    $getAssignmentsStatement->execute();
+    $getAssignmentsStatement->bind_result($number, $assignID);
+    while ($getAssignmentsStatement->fetch()) {
+        //array_push($assignments, array($number => $assignID));
+        $assignments[$number] = $assignID;
+    }
+    $getAssignmentsStatement->close();
+    return $assignments;
 }
 
 function getAssignmentID($groupID, $studentID) {
@@ -238,10 +282,10 @@ function getAssignmentDetails($assignmentID) {
     return $assignmentDetails;    
 }
 
-function getAssignmentsByCourseCode($courseCode) {
+function getAssignmentsByCourseID($courseID) {
     $mysqli = get_CoreDB_link("mysqli");
     $statement = $mysqli->prepare("SELECT Number, Description, StartDate, EndDate, Instructions, Weight, Domain, CourseRunID from assignment WHERE CourseRunID = ?");
-    $statement->bind_param('i', $courseCode);
+    $statement->bind_param('i', $courseID);
     $statement->execute();
     $statement->bind_result($number, $description, $startDate, $endDate, $instructions, $weight, $domain, $courseRunID);
     while ($statement->fetch()) {
@@ -422,6 +466,7 @@ function storeFileGuidForGroupSolution($groupID, $assignmentID, $fileGuid) {
     $statement->bind_param('iii', $groupID, $assignmentID, $fileGuid);
     $statement->execute();
     $statement->close();
+    return;
 }
 
 function getFileGuidForGroupSolution($groupID, $assignmentID) {
@@ -475,8 +520,7 @@ function storeListMetrics($activityID, $assignmentID, $studentID, $instructionID
     $getStoredListAndApplyMetrics->fetch();
     $getStoredListAndApplyMetrics->close();
 
-
-    if (isset($dbListItemsAddedCount) && $dbTimeOnPage > 0) { //if it exists, add the new numbers
+    if (isset($dbListItemsAddedCount)) { //if it exists, add the new numbers
         $dbListItemsAddedCount = $dbListItemsAddedCount + $listItemsAddedCount;
         $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
         $dbTimeOnPage += $timeOnPage;
@@ -507,30 +551,41 @@ function getCollaborativeInputMetrics($activityID, $assignmentID, $studentID, $i
     return $metricsData;
 }
 
+function executeStatementCollaborativeInputMetrics($mysqli, $query, $params, $isSelect = false) {
+    $statement = $mysqli->prepare($query);
+    $statement->bind_param(str_repeat('i', count($params)), ...$params);
+    $statement->execute();
+    if ($isSelect) {
+        $statement->bind_result($dbChatEntriesCount, $dbTimeOnPage);
+        $statement->fetch();
+        return [$dbChatEntriesCount, $dbTimeOnPage];
+    }
+    $statement->close();
+}
+
 function storeCollaborativeInputMetrics($activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getStoredCollaborativeInputMetrics = $mysqli->prepare("SELECT ChatEntriesCount, TimeOnPage from collaborativeinputmetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-    $getStoredCollaborativeInputMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
-    $getStoredCollaborativeInputMetrics->execute();
-    $getStoredCollaborativeInputMetrics->bind_result($dbChatEntriesCount, $dbTimeOnPage);
-    $getStoredCollaborativeInputMetrics->fetch();
-    $getStoredCollaborativeInputMetrics->close();
+    $query = "SELECT ChatEntriesCount, TimeOnPage from collaborativeinputmetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?";
+    list($dbChatEntriesCount, $dbTimeOnPage) = executeStatementCollaborativeInputMetrics($mysqli, $query, [$activityID, $assignmentID, $studentID, $instructionID], true);
 
+    if (isset($dbChatEntriesCount)) {
+        updateCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage, $dbChatEntriesCount, $dbTimeOnPage);
+    } else {
+        insertCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage);
+    }
+}
 
-    if (isset($dbChatEntriesCount) && $dbTimeOnPage > 0) { //if it exists, add the new numbers
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE collaborativeinputmetrics SET ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-        $updateStatement->bind_param('iiiisi', $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
-        $updateStatement->execute();
-        $updateStatement->close();        
-    }
-    else { //insert a row if it's new
-        $insertStatement = $mysqli->prepare("INSERT INTO collaborativeinputmetrics(ActivityID, AssignmentID, StudentID, InstructionID, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iisiii', $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();        
-    }
+function updateCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage, $dbChatEntriesCount, $dbTimeOnPage) {
+    $dbChatEntriesCount += $chatEntriesCount;
+    $dbTimeOnPage += $timeOnPage;
+    $query = "UPDATE collaborativeinputmetrics SET ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?";
+    executeStatementCollaborativeInputMetrics($mysqli, $query, [$dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID]);
+}
+
+function insertCollaborativeInputMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $chatEntriesCount, $timeOnPage) {
+    $query = "INSERT INTO collaborativeinputmetrics(ActivityID, AssignmentID, StudentID, InstructionID, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)";
+    $params = [(int)$activityID, (int)$assignmentID, (int)$studentID, (int)$instructionID, (int)$chatEntriesCount, (int)$timeOnPage];
+    executeStatementCollaborativeInputMetrics($mysqli, $query, $params);
 }
 
 function getSpecificListAndApplyMetrics($activityID, $assignmentID, $studentID, $instructionID) {
@@ -550,31 +605,42 @@ function getSpecificListAndApplyMetrics($activityID, $assignmentID, $studentID, 
     return $metricsData;
 }
 
+function getStoredListAndApplyMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID) {
+    $getStoredMetrics = $mysqli->prepare("SELECT ListAnswerCount, POsEditedCount, ChatEntriesCount, TimeOnPage from listandapplymetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
+    $getStoredMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
+    $getStoredMetrics->execute();
+    $getStoredMetrics->bind_result($dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage);
+    $getStoredMetrics->fetch();
+    $getStoredMetrics->close();
+    return array($dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage);
+}
+
+function updateListAndApplyMetrics($mysqli, $dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID) {
+    $updateStatement = $mysqli->prepare("UPDATE listandapplymetrics SET ListAnswerCount = ?, POsEditedCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
+    $updateStatement->bind_param('iiiiiisi', $dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
+    $updateStatement->execute();
+    $updateStatement->close();
+}
+
+function insertListAndApplyMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $listAnswerCount, $POsEditedCount, $chatEntriesCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO listandapplymetrics(ActivityID, AssignmentID, StudentID, InstructionID, ListAnswerCount, POsEditedCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iisiiiii', $activityID, $assignmentID, $studentID, $instructionID, $listAnswerCount, $POsEditedCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();
+}
+
 function storeListAndApplyMetrics($activityID, $assignmentID, $studentID, $instructionID, $listAnswerCount, $POsEditedCount, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
-    $getStoredListAndApplyMetrics = $mysqli->prepare("SELECT ListAnswerCount, POsEditedCount, ChatEntriesCount, TimeOnPage from listandapplymetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-    $getStoredListAndApplyMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
-    $getStoredListAndApplyMetrics->execute();
-    $getStoredListAndApplyMetrics->bind_result($dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage);
-    $getStoredListAndApplyMetrics->fetch();
-    $getStoredListAndApplyMetrics->close();
-
-
-    if (isset($dbListAnswerCount) && $dbTimeOnPage > 0) { //if it exists, add the new numbers
-        $dbListAnswerCount = $dbListAnswerCount + $listAnswerCount;
-        $dbPOsEditedCount = $dbPOsEditedCount + $POsEditedCount;
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
+    list($dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage) = getStoredListAndApplyMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID);
+    
+    if (isset($dbListAnswerCount) && $dbTimeOnPage > 0) {
+        $dbListAnswerCount += $listAnswerCount;
+        $dbPOsEditedCount += $POsEditedCount;
+        $dbChatEntriesCount += $chatEntriesCount;
         $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE listandapplymetrics SET ListAnswerCount = ?, POsEditedCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-        $updateStatement->bind_param('iiiiiisi', $dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
-        $updateStatement->execute();
-        $updateStatement->close();        
-    }
-    else { //insert a row if it's new
-        $insertStatement = $mysqli->prepare("INSERT INTO listandapplymetrics(ActivityID, AssignmentID, StudentID, InstructionID, ListAnswerCount, POsEditedCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iisiiiii', $activityID, $assignmentID, $studentID, $instructionID, $listAnswerCount, $POsEditedCount, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();        
+        updateListAndApplyMetrics($mysqli, $dbListAnswerCount, $dbPOsEditedCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
+    } else {
+        insertListAndApplyMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $listAnswerCount, $POsEditedCount, $chatEntriesCount, $timeOnPage);
     }
 }
 
@@ -598,6 +664,18 @@ function getSpecificConceptFanMetrics($activityID, $assignmentID, $studentID, $i
 
 function storeConceptFanMetrics($activityID, $assignmentID, $studentID, $instructionID, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
+
+    $metrics = getStoredConceptFanMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID);
+
+    if ($metrics) { //if it exists, add the new numbers
+        $metrics = updateCFMetrics($metrics, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage);
+        updateConceptFanMetrics($mysqli, $metrics, $activityID, $assignmentID, $studentID, $instructionID);
+    } else { //insert a row if it's new
+        insertConceptFanMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage);
+    }
+}
+
+function getStoredConceptFanMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID) {
     $getStoredConceptFanMetrics = $mysqli->prepare("SELECT PurposeIdeasCount, NodesCreatedCount, LeafNodesCreatedCount, ChatEntriesCount, TimeOnPage from conceptfanmetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
     $getStoredConceptFanMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
     $getStoredConceptFanMetrics->execute();
@@ -605,24 +683,31 @@ function storeConceptFanMetrics($activityID, $assignmentID, $studentID, $instruc
     $getStoredConceptFanMetrics->fetch();
     $getStoredConceptFanMetrics->close();
 
+    return isset($dbPurposeIdeasCount) ? compact('dbPurposeIdeasCount', 'dbNodesCreatedCount', 'dbLeafNodesCreatedCount', 'dbChatEntriesCount', 'dbTimeOnPage') : null;
+}
 
-    if (isset($dbPurposeIdeasCount) && $dbTimeOnPage > 0) { //if it exists, add the new numbers
-        $dbPurposeIdeasCount = $dbPurposeIdeasCount + $purposeIdeasCount;
-        $dbNodesCreatedCount = $dbNodesCreatedCount + $nodesCreatedCount;
-        $dbLeafNodesCreatedCount = $dbLeafNodesCreatedCount + $leafNodesCreatedCount;
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE conceptfanmetrics SET PurposeIdeasCount = ?, NodesCreatedCount = ?, LeafNodesCreatedCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-        $updateStatement->bind_param('iiiiiiisi', $dbPurposeIdeasCount, $dbNodesCreatedCount, $dbLeafNodesCreatedCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
-        $updateStatement->execute();
-        $updateStatement->close();        
-    }
-    else { //insert a row if it's new
-        $insertStatement = $mysqli->prepare("INSERT INTO conceptfanmetrics(ActivityID, AssignmentID, StudentID, InstructionID, PurposeIdeasCount, NodesCreatedCount, LeafNodesCreatedCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iisiiiiii', $activityID, $assignmentID, $studentID, $instructionID, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();        
-    }
+function updateCFMetrics($metrics, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage) {
+    $metrics['dbPurposeIdeasCount'] += $purposeIdeasCount;
+    $metrics['dbNodesCreatedCount'] += $nodesCreatedCount;
+    $metrics['dbLeafNodesCreatedCount'] += $leafNodesCreatedCount;
+    $metrics['dbChatEntriesCount'] += $chatEntriesCount;
+    $metrics['dbTimeOnPage'] += $timeOnPage;
+
+    return $metrics;
+}
+
+function updateConceptFanMetrics($mysqli, $metrics, $activityID, $assignmentID, $studentID, $instructionID) {
+    $updateStatement = $mysqli->prepare("UPDATE conceptfanmetrics SET PurposeIdeasCount = ?, NodesCreatedCount = ?, LeafNodesCreatedCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
+    $updateStatement->bind_param('iiiiiiisi', $metrics['dbPurposeIdeasCount'], $metrics['dbNodesCreatedCount'], $metrics['dbLeafNodesCreatedCount'], $metrics['dbChatEntriesCount'], $metrics['dbTimeOnPage'], $activityID, $assignmentID, $studentID, $instructionID);
+    $updateStatement->execute();
+    $updateStatement->close();        
+}
+
+function insertConceptFanMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO conceptfanmetrics(ActivityID, AssignmentID, StudentID, InstructionID, PurposeIdeasCount, NodesCreatedCount, LeafNodesCreatedCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iisiiiiii', $activityID, $assignmentID, $studentID, $instructionID, $purposeIdeasCount, $nodesCreatedCount, $leafNodesCreatedCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();        
 }
 
 function getSpecificChoiceMetrics($activityID, $assignmentID, $studentID, $instructionID) {
@@ -651,6 +736,18 @@ function getSpecificChoiceMetrics($activityID, $assignmentID, $studentID, $instr
 
 function storeChoiceMetrics($activityID, $assignmentID, $studentID, $instructionID, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
+
+    $metrics = getStoredChoiceMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID);
+
+    if ($metrics) { //if it exists, add the new numbers
+        $metrics = updateSCMetrics($metrics, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage);
+        updateChoiceMetrics($mysqli, $metrics, $activityID, $assignmentID, $studentID, $instructionID);
+    } else { //insert a row if it's new
+        insertChoiceMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage);
+    }
+}
+
+function getStoredChoiceMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID) {
     $getStoredChoiceMetrics = $mysqli->prepare("SELECT ClearWeakerCount, ResetPOsCount, MovementsCount, ChatEntriesCount, TimeOnPage from choicemetrics WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
     $getStoredChoiceMetrics->bind_param('iisi', $activityID, $assignmentID, $studentID, $instructionID);
     $getStoredChoiceMetrics->execute();
@@ -658,24 +755,31 @@ function storeChoiceMetrics($activityID, $assignmentID, $studentID, $instruction
     $getStoredChoiceMetrics->fetch();
     $getStoredChoiceMetrics->close();
 
+    return isset($dbClearWeakerCount) ? compact('dbClearWeakerCount', 'dbResetPOsCount', 'dbMovementsCount', 'dbChatEntriesCount', 'dbTimeOnPage') : null;
+}
 
-    if (isset($dbClearWeakerCount)) { //if it exists, add the new numbers
-        $dbClearWeakerCount = ($clearWeakerCount >= 0 ? $dbClearWeakerCount + $clearWeakerCount : $dbClearWeakerCount);
-        $dbResetPOsCount = ($resetPOsCount >= 0 ? $dbResetPOsCount + $resetPOsCount : $dbClearWeakerCount);
-        $dbMovementsCount = ($movementsCount >= 0 ? $dbMovementsCount + $movementsCount : $dbMovementsCount);
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE choicemetrics SET ClearWeakerCount = ?, ResetPOsCount = ?, MovementsCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
-        $updateStatement->bind_param('iiiiiiisi', $dbClearWeakerCount, $dbResetPOsCount, $dbMovementsCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $assignmentID, $studentID, $instructionID);
-        $updateStatement->execute();
-        $updateStatement->close();        
-    }
-    else { //insert a row if it's new
-        $insertStatement = $mysqli->prepare("INSERT INTO choicemetrics(ActivityID, AssignmentID, StudentID, InstructionID, ClearWeakerCount, ResetPOsCount, MovementsCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iisiiiiii', $activityID, $assignmentID, $studentID, $instructionID, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();        
-    }
+function updateSCMetrics($metrics, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage) {
+    $metrics['dbClearWeakerCount'] = ($clearWeakerCount >= 0 ? $metrics['dbClearWeakerCount'] + $clearWeakerCount : $metrics['dbClearWeakerCount']);
+    $metrics['dbResetPOsCount'] = ($resetPOsCount >= 0 ? $metrics['dbResetPOsCount'] + $resetPOsCount : $metrics['dbClearWeakerCount']);
+    $metrics['dbMovementsCount'] = ($movementsCount >= 0 ? $metrics['dbMovementsCount'] + $movementsCount : $metrics['dbMovementsCount']);
+    $metrics['dbChatEntriesCount'] += $chatEntriesCount;
+    $metrics['dbTimeOnPage'] += $timeOnPage;
+
+    return $metrics;
+}
+
+function updateChoiceMetrics($mysqli, $metrics, $activityID, $assignmentID, $studentID, $instructionID) {
+    $updateStatement = $mysqli->prepare("UPDATE choicemetrics SET ClearWeakerCount = ?, ResetPOsCount = ?, MovementsCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND AssignmentID = ? AND StudentID = ? AND InstructionID = ?");
+    $updateStatement->bind_param('iiiiiiisi', $metrics['dbClearWeakerCount'], $metrics['dbResetPOsCount'], $metrics['dbMovementsCount'], $metrics['dbChatEntriesCount'], $metrics['dbTimeOnPage'], $activityID, $assignmentID, $studentID, $instructionID);
+    $updateStatement->execute();
+    $updateStatement->close();        
+}
+
+function insertChoiceMetrics($mysqli, $activityID, $assignmentID, $studentID, $instructionID, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO choicemetrics(ActivityID, AssignmentID, StudentID, InstructionID, ClearWeakerCount, ResetPOsCount, MovementsCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iisiiiiii', $activityID, $assignmentID, $studentID, $instructionID, $clearWeakerCount, $resetPOsCount, $movementsCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();        
 }
 
 function getSpecificReportMetrics($activityID, $assignmentID, $studentID, $instructionID) {
@@ -700,58 +804,78 @@ function getSpecificReportMetrics($activityID, $assignmentID, $studentID, $instr
     return $metricsData;
 }
 
-function storeReportMetrics($activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage) {
-    $mysqli = get_CoreDB_link("mysqli");
+function getStoredReportMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID) {
     $getStoredReportMetrics = $mysqli->prepare("SELECT WordCount, ChatEntriesCount, TimeOnPage from reportmetrics WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
     $getStoredReportMetrics->bind_param('iiii', $activityID, $studentID, $instructionID, $assignmentID);
     $getStoredReportMetrics->execute();
     $getStoredReportMetrics->bind_result($dbWordCount, $dbChatEntriesCount, $dbTimeOnPage);
     $getStoredReportMetrics->fetch();
-    $getStoredReportMetrics->close();    
+    $getStoredReportMetrics->close();
+    return array($dbWordCount, $dbChatEntriesCount, $dbTimeOnPage);
+}
+
+function updateReportMetrics($mysqli, $dbWordCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID) {
+    $updateStatement = $mysqli->prepare("UPDATE reportmetrics SET WordCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
+    $updateStatement->bind_param('iiiiiii', $dbWordCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
+    $updateStatement->execute();
+    $updateStatement->close();
+}
+
+function insertReportMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO reportmetrics(ActivityID, StudentID, InstructionID, AssignmentID, WordCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();
+}
+
+function storeReportMetrics($activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage) {
+    $mysqli = get_CoreDB_link("mysqli");
+    list($dbWordCount, $dbChatEntriesCount, $dbTimeOnPage) = getStoredReportMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID);
     
     if (isset($dbWordCount)) {
         $dbWordCount = ($wordCount >= 0 ? $wordCount : $dbWordCount);
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
+        $dbChatEntriesCount += $chatEntriesCount;
         $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE reportmetrics SET WordCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
-        $updateStatement->bind_param('iiiiiii', $dbWordCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
-        $updateStatement->execute();
-        $updateStatement->close();           
-    }
-    else {
-        if ($wordCount >= 0) { //if $wordCount < 0, this is a time update. A time update with no wordcount is pointless, so don't store. <-- is this true?
-            $insertStatement = $mysqli->prepare("INSERT INTO reportmetrics(ActivityID, StudentID, InstructionID, AssignmentID, WordCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $insertStatement->bind_param('iiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage);
-            $insertStatement->execute();
-            $insertStatement->close();   
-        }
+        updateReportMetrics($mysqli, $dbWordCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
+    } else if ($wordCount >= 0) {
+        insertReportMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $wordCount, $chatEntriesCount, $timeOnPage);
     }
 }
 
-function storeRandomWordGeneratorMetrics($activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage) {
-    $mysqli = get_CoreDB_link("mysqli");
+function getStoredRandomWordGeneratorMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID) {
     $getStoredReportMetrics = $mysqli->prepare("SELECT WordsGeneratedCount, TimeOnPage from randomwordgeneratormetrics WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
     $getStoredReportMetrics->bind_param('iiii', $activityID, $studentID, $instructionID, $assignmentID);
     $getStoredReportMetrics->execute();
     $getStoredReportMetrics->bind_result($dbWordsGeneratedCount, $dbTimeOnPage);
     $getStoredReportMetrics->fetch();
-    $getStoredReportMetrics->close();    
+    $getStoredReportMetrics->close();
+    return array($dbWordsGeneratedCount, $dbTimeOnPage);
+}
+
+function updateRandomWordGeneratorMetrics($mysqli, $dbWordsGeneratedCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID) {
+    $updateStatement = $mysqli->prepare("UPDATE randomwordgeneratormetrics SET WordsGeneratedCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
+    $updateStatement->bind_param('iiiiii', $dbWordsGeneratedCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
+    $updateStatement->execute();
+    $updateStatement->close();
+}
+
+function insertRandomWordGeneratorMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO randomwordgeneratormetrics(ActivityID, StudentID, InstructionID, AssignmentID, WordsGeneratedCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iiiiii', $activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();
+}
+
+function storeRandomWordGeneratorMetrics($activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage) {
+    $mysqli = get_CoreDB_link("mysqli");
+    list($dbWordsGeneratedCount, $dbTimeOnPage) = getStoredRandomWordGeneratorMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID);
     
     if (isset($dbWordsGeneratedCount)) {
-        $dbWordsGeneratedCount = ($wordCount >= 0 ? $wordCount : $dbWordsGeneratedCount);
+        $dbWordsGeneratedCount = ($wordsGeneratedCount >= 0 ? $wordsGeneratedCount : $dbWordsGeneratedCount);
         $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE randomwordgeneratormetrics SET WordsGeneratedCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
-        $updateStatement->bind_param('iiiiii', $dbWordsGeneratedCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
-        $updateStatement->execute();
-        $updateStatement->close();           
-    }
-    else {
-        if ($wordsGeneratedCount >= 0) { //if $wordsGeneratedCount < 0, this is a time update. A time update with no wordcount is pointless, so don't store. <-- is this true?
-            $insertStatement = $mysqli->prepare("INSERT INTO randomwordgeneratormetrics(ActivityID, StudentID, InstructionID, AssignmentID, WordsGeneratedCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?)");
-            $insertStatement->bind_param('iiiiii', $activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage);
-            $insertStatement->execute();
-            $insertStatement->close();   
-        }
+        updateRandomWordGeneratorMetrics($mysqli, $dbWordsGeneratedCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
+    } else if ($wordsGeneratedCount >= 0) {
+        insertRandomWordGeneratorMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $wordsGeneratedCount, $timeOnPage);
     }
 }
 
@@ -782,42 +906,51 @@ function getSpecificInAndOutMetrics($activityID, $assignmentID, $studentID, $ins
 
 function storeInAndOutMetrics($activityID, $studentID, $instructionID, $assignmentID, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
+
+    $metrics = getStoredInAndOutMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID);
+
+    if ($metrics) { //if it exists, add the new numbers
+        $metrics = updateIOMetrics($metrics, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage);
+        updateInAndOutMetrics($mysqli, $metrics, $activityID, $studentID, $instructionID, $assignmentID);
+    } else { //insert a row if it's new
+        insertInAndOutMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage);
+    }
+}
+
+function getStoredInAndOutMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID) {
     $getStoredInAndOutMetrics = $mysqli->prepare("SELECT ResetPOsClicksCount, ClearOutClicksCount, MovementsCount, AddedCharacteristicsCount, ChatEntriesCount, TimeOnPage from inandoutmetrics WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
     $getStoredInAndOutMetrics->bind_param('iiii', $activityID, $studentID, $instructionID, $assignmentID);
     $getStoredInAndOutMetrics->execute();
     $getStoredInAndOutMetrics->bind_result($dbResetPOsClicksCount, $dbClearOutClicksCount, $dbMovementsCount, $dbAddedCharacteristicsCount, $dbChatEntriesCount, $dbTimeOnPage);
     $getStoredInAndOutMetrics->fetch();
-    $getStoredInAndOutMetrics->close();    
-    
-    if (isset($dbResetPOsClicksCount)) {
-        //$dbResetPOsClicksCount += $resetPOsClicksCount;
-        $dbResetPOsClicksCount = ($resetPOsClicksCount >= 0 ? $dbResetPOsClicksCount + $resetPOsClicksCount : $dbResetPOsClicksCount);
-        //$dbClearOutClicksCount += $clearOutClicksCount;
-        $dbClearOutClicksCount = ($clearOutClicksCount >= 0 ? $dbClearOutClicksCount + $clearOutClicksCount : $dbClearOutClicksCount);
-        //$dbMovementsCount += $movementsCount;
-        $dbMovementsCount = ($movementsCount >= 0 ? $dbMovementsCount + $movementsCount : $dbMovementsCount);
-        //$dbAddedCharacteristicsCount += $addedCharacteristicsCount;
-        $dbAddedCharacteristicsCount = ($addedCharacteristicsCount >= 0 ? $dbAddedCharacteristicsCount + $addedCharacteristicsCount : $dbAddedCharacteristicsCount);
-        $dbChatEntriesCount = ($chatEntriesCount >= 0) ? $dbChatEntriesCount + $chatEntriesCount : $dbChatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE inandoutmetrics SET ResetPOsClicksCount = ?, ClearOutClicksCount = ?, MovementsCount = ?, AddedCharacteristicsCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
-        $updateStatement->bind_param('iiiiiiiiii', $dbResetPOsClicksCount, $dbClearOutClicksCount, $dbMovementsCount, $dbAddedCharacteristicsCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
-        $updateStatement->execute();
-        $updateStatement->close();           
-    }
-    else {
-        if ($resetPOsClicksCount < 0) {
-            $resetPOsClicksCount = 0;
-            $clearOutClicksCount = 0;
-            $movementsCount = 0;
-            $addedCharacteristicsCount = 0;
-            $chatEntriesCount = 0;
-        }
-        $insertStatement = $mysqli->prepare("INSERT INTO inandoutmetrics(ActivityID, StudentID, InstructionID, AssignmentID, ResetPOsClicksCount, ClearOutClicksCount, MovementsCount, AddedCharacteristicsCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iiiiiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();   
-    }
+    $getStoredInAndOutMetrics->close();
+
+    return isset($dbResetPOsClicksCount) ? compact('dbResetPOsClicksCount', 'dbClearOutClicksCount', 'dbMovementsCount', 'dbAddedCharacteristicsCount', 'dbChatEntriesCount', 'dbTimeOnPage') : null;
+}
+
+function updateIOMetrics($metrics, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage) {
+    $metrics['dbResetPOsClicksCount'] += $resetPOsClicksCount;
+    $metrics['dbClearOutClicksCount'] += $clearOutClicksCount;
+    $metrics['dbMovementsCount'] += $movementsCount;
+    $metrics['dbAddedCharacteristicsCount'] += $addedCharacteristicsCount;
+    $metrics['dbChatEntriesCount'] += $chatEntriesCount;
+    $metrics['dbTimeOnPage'] += $timeOnPage;
+
+    return $metrics;
+}
+
+function updateInAndOutMetrics($mysqli, $metrics, $activityID, $studentID, $instructionID, $assignmentID) {
+    $updateStatement = $mysqli->prepare("UPDATE inandoutmetrics SET ResetPOsClicksCount = ?, ClearOutClicksCount = ?, MovementsCount = ?, AddedCharacteristicsCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
+    $updateStatement->bind_param('iiiiiiiiii', $metrics['dbResetPOsClicksCount'], $metrics['dbClearOutClicksCount'], $metrics['dbMovementsCount'], $metrics['dbAddedCharacteristicsCount'], $metrics['dbChatEntriesCount'], $metrics['dbTimeOnPage'], $activityID, $studentID, $instructionID, $assignmentID);
+    $updateStatement->execute();
+    $updateStatement->close();        
+}
+
+function insertInAndOutMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage) {
+    $insertStatement = $mysqli->prepare("INSERT INTO inandoutmetrics(ActivityID, StudentID, InstructionID, AssignmentID, ResetPOsClicksCount, ClearOutClicksCount, MovementsCount, AddedCharacteristicsCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iiiiiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $resetPOsClicksCount, $clearOutClicksCount, $movementsCount, $addedCharacteristicsCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();        
 }
 
 function getSpecificRoundRobinMetrics($activityID, $assignmentID, $studentID, $instructionID) {
@@ -844,30 +977,49 @@ function getSpecificRoundRobinMetrics($activityID, $assignmentID, $studentID, $i
 
 function storeRoundRobinMetrics($activityID, $studentID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage) {
     $mysqli = get_CoreDB_link("mysqli");
+
+    $metrics = getStoredRoundRobinMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID);
+
+    if ($metrics) { //if it exists, add the new numbers
+        $metrics = updateRRMetrics($metrics, $viewsEnteredCount, $chatEntriesCount, $timeOnPage);
+        updateRoundRobinMetrics($mysqli, $metrics, $activityID, $studentID, $instructionID, $assignmentID);
+    } else { //insert a row if it's new
+        insertRoundRobinMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage);
+    }
+}
+
+function getStoredRoundRobinMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID) {
     $getStoredRoundRobinMetrics = $mysqli->prepare("SELECT ViewsEnteredCount, ChatEntriesCount, TimeOnPage from roundrobinmetrics WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
     $getStoredRoundRobinMetrics->bind_param('iiii', $activityID, $studentID, $instructionID, $assignmentID);
     $getStoredRoundRobinMetrics->execute();
     $getStoredRoundRobinMetrics->bind_result($dbViewsEnteredCount, $dbChatEntriesCount, $dbTimeOnPage);
     $getStoredRoundRobinMetrics->fetch();
-    $getStoredRoundRobinMetrics->close();    
-    
-    if (isset($dbViewsEnteredCount)) {
-        //if $viewsEnteredCount is -1, assume storeTimeOnPage from window.tabclose, not form submit and don't change count, otherwise add to existing count
-        $dbViewsEnteredCount = ($viewsEnteredCount >= 0 ? ($dbViewsEnteredCount + $viewsEnteredCount) : $dbViewsEnteredCount); 
-        $dbChatEntriesCount = $dbChatEntriesCount + $chatEntriesCount;
-        $dbTimeOnPage += $timeOnPage;
-        $updateStatement = $mysqli->prepare("UPDATE roundrobinmetrics SET ViewsEnteredCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
-        $updateStatement->bind_param('iiiiiii', $dbViewsEnteredCount, $dbChatEntriesCount, $dbTimeOnPage, $activityID, $studentID, $instructionID, $assignmentID);
-        $updateStatement->execute();
-        $updateStatement->close();           
-    }
-    else {
-        $viewsEnteredCount = ($viewsEnteredCount >= 0 ? $viewsEnteredCount : 0);
-        $insertStatement = $mysqli->prepare("INSERT INTO roundrobinmetrics(ActivityID, StudentID, InstructionID, AssignmentID, ViewsEnteredCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $insertStatement->bind_param('iiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage);
-        $insertStatement->execute();
-        $insertStatement->close();   
-    }
+    $getStoredRoundRobinMetrics->close();
+
+    return isset($dbViewsEnteredCount) ? compact('dbViewsEnteredCount', 'dbChatEntriesCount', 'dbTimeOnPage') : null;
+}
+
+function updateRRMetrics($metrics, $viewsEnteredCount, $chatEntriesCount, $timeOnPage) {
+    $metrics['dbViewsEnteredCount'] = ($viewsEnteredCount >= 0 ? ($metrics['dbViewsEnteredCount'] + $viewsEnteredCount) : $metrics['dbViewsEnteredCount']);
+    $metrics['dbChatEntriesCount'] += $chatEntriesCount;
+    $metrics['dbTimeOnPage'] += $timeOnPage;
+
+    return $metrics;
+}
+
+function updateRoundRobinMetrics($mysqli, $metrics, $activityID, $studentID, $instructionID, $assignmentID) {
+    $updateStatement = $mysqli->prepare("UPDATE roundrobinmetrics SET ViewsEnteredCount = ?, ChatEntriesCount = ?, TimeOnPage = ? WHERE ActivityID = ? AND StudentID = ? AND InstructionID = ? AND AssignmentID = ?");
+    $updateStatement->bind_param('iiiiiii', $metrics['dbViewsEnteredCount'], $metrics['dbChatEntriesCount'], $metrics['dbTimeOnPage'], $activityID, $studentID, $instructionID, $assignmentID);
+    $updateStatement->execute();
+    $updateStatement->close();        
+}
+
+function insertRoundRobinMetrics($mysqli, $activityID, $studentID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage) {
+    $viewsEnteredCount = ($viewsEnteredCount >= 0 ? $viewsEnteredCount : 0);
+    $insertStatement = $mysqli->prepare("INSERT INTO roundrobinmetrics(ActivityID, StudentID, InstructionID, AssignmentID, ViewsEnteredCount, ChatEntriesCount, TimeOnPage) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $insertStatement->bind_param('iiiiiii', $activityID, $studentID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage);
+    $insertStatement->execute();
+    $insertStatement->close();        
 }
 
 function getUserCPEngagement($assignmentID, $StudentELGGID, $toolID) {
@@ -884,45 +1036,49 @@ function getUserCPEngagement($assignmentID, $StudentELGGID, $toolID) {
     return $cpEngagement;
 }
 
+function executeStatement($mysqli, $query, $params, $isSelect = false) {
+    $statement = $mysqli->prepare($query);
+    $statement->bind_param(str_repeat('i', count($params)), ...$params);
+    $statement->execute();
+    if ($isSelect) {
+        $statement->bind_result($numberOfRows);
+        $statement->fetch();
+        return $numberOfRows;
+    }
+    $statement->close();
+}
+
 function storeUserCPEngagement($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
     if (studentHasUsedToolInStage($StageNum, $assignmentID, $StudentELGGID, $toolID)) {
         if (studentHasUsedToolInAdvancedStage($StageNum, $assignmentID, $StudentELGGID, $toolID)) {
-            //increment iteration
-            $statement = $mysqli->prepare("UPDATE usercpengagement SET Iteration = Iteration + 1 WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-            $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-            $statement->execute();
-            $statement->close();
+            updateUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID);
         }
+    } else {
+        insertUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID);
     }
-    else {
-        $statement = $mysqli->prepare("INSERT INTO usercpengagement(StageNumber, Assignment_ID, Student_ELGG_ID, Tool_ID, Iteration) VALUES (?, ?, ?, ?, ?)");
-        $statement->bind_param('iiiii', $StageNum, $assignmentID, $StudentELGGID, $toolID, $iteration = 1);
-        $statement->execute();
-        $statement->close();
-    }
+}
+
+function updateUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID) {
+    $query = "UPDATE usercpengagement SET Iteration = Iteration + 1 WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID]);
+}
+
+function insertUserCPEngagement($mysqli, $StageNum, $assignmentID, $StudentELGGID, $toolID) {
+    $query = "INSERT INTO usercpengagement(StageNumber, Assignment_ID, Student_ELGG_ID, Tool_ID, Iteration) VALUES (?, ?, ?, ?, ?)";
+    executeStatement($mysqli, $query, [$StageNum, $assignmentID, $StudentELGGID, $toolID, 1]);
 }
 
 function studentHasUsedToolInAdvancedStage($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber > ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-    $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-    $statement->execute();
-    $statement->bind_result($numberOfRows);
-    $statement->fetch();
-    $statement->close();
-    return $numberOfRows > 0;
+    $query = "SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber > ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    return executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID], true) > 0;
 }
 
 function studentHasUsedToolInStage($StageNum, $assignmentID, $StudentELGGID, $toolID) {
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?");
-    $statement->bind_param('iiii', $assignmentID, $StageNum, $toolID, $StudentELGGID);
-    $statement->execute();
-    $statement->bind_result($numberOfRows);
-    $statement->fetch();
-    $statement->close();
-    return $numberOfRows > 0;
+    $query = "SELECT COUNT(*) from usercpengagement WHERE Assignment_ID = ? AND StageNumber = ? AND Tool_ID = ? AND Student_ELGG_ID = ?";
+    return executeStatement($mysqli, $query, [$assignmentID, $StageNum, $toolID, $StudentELGGID], true) > 0;
 }
 
 function getGroupSolutionCreativeProcessByTool($groupID, $assignmentID, $activityID, $instructionID, $toolID) {
@@ -1030,14 +1186,16 @@ function getActivityDetails($activityID /*, $assignID*/) {
     //$questionTypeID = getQuestionTypeID($assignID);
 
     $mysqli = get_CoreDB_link("mysqli");
-    $statement = $mysqli->prepare("SELECT Description from activity WHERE A_ID = ?");
+    $statement = $mysqli->prepare("SELECT Description, ShortDescription from activity WHERE A_ID = ?");
     $statement->bind_param('i', $activityID);
     $statement->execute();
-    $statement->bind_result($description);
+    $statement->bind_result($description, $shortDescription);
     $statement->fetch();
     $statement->close();
     $activity['activityID'] = $activityID;
     $activity['description'] = $description;
+    $activity['shortDesc'] = $shortDescription;
+
 
     $statement1 = $mysqli->prepare("SELECT DISTINCT ains.i_id FROM `a_instructions` ains 
                                         INNER JOIN `instructions` ins ON ains.i_id = ins.i_id
@@ -1726,17 +1884,6 @@ function getToolData($groupID, $instructionID, $toolID, $activityID, $assignment
     return $data;
 }
 
-/**
- * getListMetrics
- *
- * Gets list metrics for a given student, assignment, activity within a range of instructionids
- *
- * @param studentID Student's ELGG ID
- * @param assignmentID The assignmentID
- * @param activityIDs An array of activityIDs
- * @param instructionIDs An array of instructionIDs
- * @return listMetric An object containing listItemsAddedCount, chatEntriesCount and timeOnPage
- */
 function getListMetrics($studentID, $assignmentID, $activityIDs, $instructionIDs) {
     $activityIDList = implode(', ', $activityIDs);
     $instructionIDList = implode(', ', $instructionIDs); // 3, 4, 5
@@ -1880,7 +2027,7 @@ function getTotalCFLeafNodesCreated($cfMetrics) {
 }
 
 function getTotalExplorePagesCreatedByUser($startDate, $endDate, $user) {
-    $pages = $user->getObjects('page_top', 100, 0); //could use elgg_get_entities_from_metadata
+    $pages =  $user->getObjects('page_top', 100, 0);; //could use elgg_get_entities_from_metadata
     $totalExplorePages = 0;
     $startDateTimestamp = strtotime($startDate);
     $endDateTimestamp = strtotime($endDate);
@@ -1906,7 +2053,7 @@ function getExploreRating($currentUser, $assignmentDetails) {
     $laaTotalRating = (($laaPOsEditedRating + $laaListAnswersRating) * 25) / 100;
     $sectionRatings[] = $laaTotalRating;
     //*'Explore' page in SN - for a person, and a given time
-    $totalExplorePages = getTotalExplorePagesCreatedByUser($assignmentDetails->startDate, $assignmentDetails->endDate, $currentUser);
+    //$totalExplorePages = getTotalExplorePagesCreatedByUser($assignmentDetails->startDate, $assignmentDetails->endDate, $currentUser);
     $exploreRating = ($totalExplorePages > 0 ? 25 : 0);
     $sectionRatings[] = $exploreRating;
     //*concept fan - all nodes and leaf nodes
@@ -1973,7 +2120,7 @@ function getCommunicationRating($currentUser, $assignmentDetails) {
     $totalChatEntries = getTotalChatEntries($studentID, $assignmentDetails->id);
     $communicationChatRating = getRating($totalChatEntries, 60, 9, 17, 24);
     
-    $totalSocialNetworkingPosts = getTotalSocialNetworkingPosts($currentUser, $assignmentDetails->startDate, $assignmentDetails->endDate);
+    //$totalSocialNetworkingPosts = getTotalSocialNetworkingPosts($currentUser, $assignmentDetails->startDate, $assignmentDetails->endDate);
     $communicationSocialNetworkingRating = getRating($totalSocialNetworkingPosts, 40, 3, 5, 7);
     
     return round($communicationChatRating + $communicationSocialNetworkingRating);
@@ -2068,43 +2215,6 @@ function getDataGatheringRatingClassAverage($assignmentDetails) {
     }
     return round($rating / count($studentsInClass));       
     
-//    //CIT_ID 4, 5, 6
-//    $toolID = 1;  $activityID = 2;
-//    $citIDs = array();
-//    $citIDs[0] = 4; $citIDs[1] = 5; $citIDs[2] = 6;
-//    $sum = 0; $numStudents = 0;
-//    $allGroupIDs = array();
-//    //R: $instructionID isn't set. I'm going to assume 3, 4, 5
-//    //D: I changed the method to not use instructionID, more like duplicated the method with a new name
-//    $allGroupIDs = getAllGroups2($assignmentDetails->id, $activityID, $toolID);
-//    if (count($allGroupIDs) == 0) return 0;
-//    foreach ($allGroupIDs as $groupID) {
-//        $groupMemberIDs = array();
-//        $groupMemberIDs = getAllGroupMembers($groupID, $assignmentDetails->id);
-//        foreach ($groupMemberIDs as $groupMember) {
-//            $instructionID = 3;
-//            $data = getToolData($groupID, $instructionID, $toolID, $activityID, $assignmentDetails->id);
-//            $count = getUserResponsesCount($data, $citIDs, $groupMember);
-//
-//            $instructionID = 4;
-//            $data = getToolData($groupID, $instructionID, $toolID, $activityID, $assignmentDetails->id);
-//            $count = $count + getUserResponsesCount($data, $citIDs, $groupMember);
-//
-//            $instructionID = 5;
-//            $data = getToolData($groupID, $instructionID, $toolID, $activityID, $assignmentDetails->id);
-//            $count = $count + getUserResponsesCount($data, $citIDs, $groupMember);
-//            
-//            $sum = $sum + $count;
-//            $numStudents = $numStudents + 1;
-//        }
-//    }
-//    $totalNumberOfResponses = $sum;
-//    $totalNumberOfQuestions = $numStudents * 3;
-//    //numStudents is 0, because getAllGroups returns an empty array, because the instructionID isn't set.
-//    $classAverage = round($totalNumberOfResponses / $totalNumberOfQuestions * 100);
-//    
-//    //list tool average has to be done here
-//    return $classAverage;
 }
 
 function getDataAnalysisRating($assignmentDetails, $currentUser) {
@@ -2129,28 +2239,6 @@ function getDataAnalysisRatingClassAverage($assignmentDetails) {
         $rating += getDataAnalysisRating($assignmentDetails, $user);
     }
     return round($rating / count($studentsInClass));   
-//    $toolID = 1; $instructionID = 6; $activityID = 3;
-//    $citIDs = array();
-//    $citIDs[0] = 7; $citIDs[1] = 8; $citIDs[2] = 9;
-//    $sum = 0; $numStudents = 0;
-//    $allGroupIDs = array();
-//    $allGroupIDs = getAllGroups($assignmentDetails->id, $activityID, $instructionID, $toolID);
-//    if (count($allGroupIDs) == 0) return 0;
-//    foreach ($allGroupIDs as $groupID) {
-//        $groupMemberIDs = array();
-//        $groupMemberIDs = getAllGroupMembers($groupID, $assignmentDetails->id);
-//        $data = getToolData($groupID, $instructionID, $toolID, $activityID, $assignmentDetails->id);
-//        foreach ($groupMemberIDs as $groupMember) {
-//            $count = getUserResponsesCount($data, $citIDs, $groupMember);
-//            $sum = $sum + $count;
-//            $numStudents = $numStudents + 1;
-//        }
-//    }
-//    $totalNumberOfResponses = $sum;
-//    $totalNumberOfQuestions = $numStudents * 3;
-//    $classAverage = round($totalNumberOfResponses / $totalNumberOfQuestions * 100);
-//    
-//    return $classAverage;
 }
 
 function getIdeaGenerationRating($assignmentDetails, $currentUser) {
@@ -2615,17 +2703,15 @@ function getAllStudentCriteriaFromDB() {
 }
 
 function storeStudentCriteriaRatings($criteriaType, $ratings) {
-    $sqlCriteriaBulkInsert = array();
-    foreach ($ratings as $studentRating) {
-        $sqlCriteriaBulkInsert[] = 
-        '(' . 
-                mysql_real_escape_string($studentRating->StudentID . ", " . $studentRating->CriteriaID . ", " . $studentRating->Rating) . 
-        ')';
-    }
-    $insertSQL = 'REPLACE INTO student_' . $criteriaType . '_responses (StudentID, CriteriaID, Rating) VALUES ' . implode(',', $sqlCriteriaBulkInsert);   
     $mysqli = get_CoreDB_link("mysqli");
+    $insertSQL = 'REPLACE INTO student_' . $criteriaType . '_responses (StudentID, CriteriaID, Rating) VALUES (?, ?, ?)';
     $statement = $mysqli->prepare($insertSQL);
-    $statement->execute();
+
+    foreach ($ratings as $studentRating) {
+        $statement->bind_param("sss", $studentRating->StudentID, $studentRating->CriteriaID, $studentRating->Rating);
+        $statement->execute();
+    }
+
     error_log($mysqli->error);
     $statement->close();
 }
@@ -2912,7 +2998,6 @@ function getReportURL($groupID, $activityID, $instructionID, $assignmentID) {
 }
 
 function getCollaborativeInputToolInstructions($instructionID) {
-    $instructions = array();
     $mysqli = get_CoreDB_link("mysqli");
     $statement1 = $mysqli->prepare("SELECT CIT_ID, QuestionPrompt, SpecificHint, GroupAnswerHeading from collaborativeinputtoolinstructions WHERE I_ID = ?");
     $statement1->bind_param('i', $instructionID);
@@ -2935,16 +3020,16 @@ function getSessionKey($toolAcronym, $groupID, $assignmentID, $instructionID) {
 }
 
 function getGroupMembers($groupID, $assignmentID, $user) {
-    if (!isset($assignmentID)) {
-        die("Invalid Assignment.");
+    
+    $mysqli = get_CoreDB_link("mysqli");
+    $groupMembers = array();
+    $statement = $mysqli->prepare("SELECT s.ELGG_ID, s.Name FROM grouplist g INNER JOIN student s ON g.StudentELGG_ID = s.ELGG_ID WHERE g.GroupELGG_ID = ? AND g.AssignmentID = ? AND g.StudentELGG_ID != ?");
+    $statement->bind_param('iii', $groupID, $assignmentID, $user);
+    $statement->execute();
+    $statement->bind_result($studentID, $studentName);
+    while ($statement->fetch()) {
+        $groupMembers[] = array('id' => $studentID, 'name' => $studentName);
     }
-    if (!isset($user))  {
-        $user = elgg_get_logged_in_user_entity();
-    }
-    if (!isset($groupID)) {
-        $groupID = getGroupID($assignmentID, $user);
-    }
-    $groupMembers = get_group_members($groupID);
 
     return $groupMembers;
 }

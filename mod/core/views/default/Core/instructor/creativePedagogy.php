@@ -1,12 +1,18 @@
+
 <div class="elgg-main elgg-body">
     <ul class="elgg-menu elgg-breadcrumbs"><li>Creativity Process</li></ul>
+    <div class="elgg-head clearfix">
+        <h2 class="elgg-heading-main">Creative Pedagogy</h2>
+    </div>
+    
     
 <?php
+
 $assignmentID = $vars['assignmentID'];
 $cpID = get_input('cpID');
 $cpDetails = getCPDetails($assignmentID,$cpID);
-$cpName = $cpDetails['cpData'][0];
-$cpOverview = $cpDetails['cpData'][1];
+$cpName = $cpDetails->name;
+$cpOverview = $cpDetails->overview;
 echo "<div class='elgg-head clearfix'><h2 class='elgg-heading-main'>$cpName</h2></div>";
 echo "<blockquote><p>$cpName: $cpOverview</p></blockquote>";
 $stages = $cpDetails['stages'];

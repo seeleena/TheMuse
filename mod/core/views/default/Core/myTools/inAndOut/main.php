@@ -32,7 +32,8 @@ $activityID    = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -44,93 +45,119 @@ $_SESSION['activityID'] = $activityID;
 
 $allPossibilities = getPOs($groupID, $assignmentID);
 ?>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> 
     <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
     <!-- TimeMe -->
     <script type="text/javascript" src="<?php echo getElggJSURL()?>timeme/timeme.min.js"></script>
     <script type="text/javascript" src="<?php echo getElggJSURL()?>common/timing.js"></script>    
     <script type="text/javascript" src="<?php echo getElggJSURL()?>common/toolMetrics.js"></script>   
     <style>
-        #poContainer {
-            width: 100%;
-        }
-        #strongerPOs, #weakerPOs {
-            border: 1px solid #444444;
-            width: 100%;
-            min-height: 20px;
-            list-style-type: none;
-            margin: 0;
-            padding: 5px 0 0 0;
-            float: left;
-            margin-right: 10px;
-            height: 300px;
-            overflow: auto;
-        }
-        #strongerPOs li.possibility, #weakerPOs li.possibility {
-            color: white;
-            margin: 0 5px 5px 5px;
-            padding: 5px;
-            font-size: 1.2em;
-            -moz-border-radius: 1em;
-            -webkit-border-radius: 1em;
-            border-radius: 1em;
-            border: 2px solid #006AB6;
-            background: #4690D6;
-        }
+    .elgg-main {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    #poContainer {
+      width: 100%;
+    }
+
+    #strongerPOs,
+    #weakerPOs {
+      border: 1px solid #444444;
+      width: 100%;
+      min-height: 20px;
+      list-style-type: none;
+      margin: 0;
+      padding: 5px 0 0 0;
+      float: left;
+      margin-right: 10px;
+      height: 300px;
+      overflow: auto;
+    }
+
+    #strongerPOs li.possibility,
+    #weakerPOs li.possibility {
+      color: white;
+      margin: 0 5px 5px 5px;
+      padding: 5px;
+      font-size: 1.2em;
+      border-radius: 1em;
+      border: 2px solid #006AB6;
+      background: #4690D6;
+    }
+
     #chatContainer div.border {
-            border: 1px solid black;
-            /*min-height: 50px;*/
-            height: 150px;
-            overflow: auto;
-        }
+      border: 1px solid black;
+      height: 150px;
+      overflow: auto;
+    }
+
     #listContainer {
-        width: 60%;
-        float: left;
+      width: 60%;
+      float: left;
     }
-    #listContainer div.border{
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 500px;
-        overflow: auto;
+
+    #listContainer div.border {
+      border: 1px solid black;
+      height: 500px;
+      overflow: auto;
     }
+
     #listItems {
-        height: 300px;
-        border: 1px solid black;
-        overflow: auto;
+      height: 300px;
+      border: 1px solid black;
+      overflow: auto;
     }
+
     #chatContainer div.border {
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 100px;
-        overflow: auto;
+      border: 1px solid black;
+      height: 100px;
+      overflow: auto;
     }
+
     #chat {
-        overflow: auto;
-        height: 300px;
+      overflow: auto;
+      height: 300px;
     }
+
     #chatContainer {
-        float: right;
-        width: 38%;
+      float: right;
+      width: 38%;
     }
+
     #formFinishContainer {
-        width: 300px;
-        float: left;
+      width: 300px;
+      float: left;
     }
+
     #listInputContainer {
-        width: 100%;
-        float: left;
+      width: 100%;
+      float: left;
     }
-    #listInputContainer div.border, #chatContainer div.border {
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 300px;
-        overflow: auto;
+
+    #listInputContainer div.border,
+    #chatContainer div.border {
+      border: 1px solid black;
+      height: 300px;
+      overflow: auto;
     }
+
     input[type="submit"] {
-        width: auto;
+      width: auto;
     }
+
     #originalPOs {
-        display: none;
+      display: none;
+    }
+
+    .myHr {
+      border: none;
+      height: 1px;
+      /* Set the appropriate background color */
+      background-color: #ddd;
+      /* Add a bit of opacity */
+      opacity: 0.1;
     }
     
 </style>
@@ -151,20 +178,20 @@ $allPossibilities = getPOs($groupID, $assignmentID);
     </div>
 </div>
 <div id="chatContainer" class="box">
-        <h4>Type a message below to start chatting.</h4>
-        <div class="border">
-            <ul id="chat">
-            </ul>
-        </div>
-        <label for="chatMessage">
-            Message:
-        </label>
-        <?php
-            echo elgg_view('input/text', array('id' => 'chatMessage', 'name' => 'chatMessage'));
-        ?>
+    <h4>Type a message below to start chatting.</h4>
+    <div class="border">
+        <ul id="chat">
+        </ul>
+    </div>
+    <label for="chatMessage">
+        Message:
+    </label>
+    <?php
+        echo elgg_view('input/text', array('id' => 'chatMessage', 'name' => 'chatMessage'));
+    ?>
 </div>  
 <br />
-<hr class="myHr"/>
+    <hr class="myHr"/>
 <br />
 <table id="poContainer">
     <tr>
@@ -223,6 +250,8 @@ $allPossibilities = getPOs($groupID, $assignmentID);
     ));
     ?>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -235,7 +264,7 @@ $allPossibilities = getPOs($groupID, $assignmentID);
     var submittedByCurrentUser = false;
     var listItems = [];
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             var allPossibilities = getAllInitialPossibilities();
@@ -255,7 +284,7 @@ $allPossibilities = getPOs($groupID, $assignmentID);
                 updateListItems(data.listItems);
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "inAndOut_changed") {
@@ -300,26 +329,26 @@ $allPossibilities = getPOs($groupID, $assignmentID);
             if (serverListItems == undefined) { return; }
             listItems = serverListItems;
             var listItem;
-            var listItemsDiv = $("#listItems");
+            var listItemsDiv = jQuery("#listItems");
             listItemsDiv.empty();
             for (var i = 0; i < serverListItems.length; i++) {
                 listItem = serverListItems[i];
-                $("<p>" + listItem.user + ": " + listItem.listItem + "</p>").appendTo(listItemsDiv);
+                jQuery("<p>" + listItem.user + ": " + listItem.listItem + "</p>").appendTo(listItemsDiv);
             }
         }
         
-        $("#btnAddListItem").click(function() {
-            updateCount($("#addedCharacteristicsCount"));
-            var listItemInput = $("#listItem");
+        jQuery("#btnAddListItem").click(function() {
+            updateCount(jQuery("#addedCharacteristicsCount"));
+            var listItemInput = jQuery("#listItem");
             var newListItem = listItemInput.val();
             listItemInput.val("");
             socket.emit("inAndOut_add_Req", { room: roomKey, user: currentUser, listItem: newListItem });
         });        
         
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                updateCount($("#chatEntriesCount"));                
-                var chatMessageBox = $(this);
+                updateCount(jQuery("#chatEntriesCount"));                
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -329,23 +358,23 @@ $allPossibilities = getPOs($groupID, $assignmentID);
         
         //should be called by form submit fn        
         function storeListItems() {
-            $("#allListItemsData").val(JSON.stringify(listItems));
+            jQuery("#allListItemsData").val(JSON.stringify(listItems));
         }     
         
         ////choice part begins here
         //http://api.jqueryui.com/sortable/#event-receive
-            $( "#strongerPOs, #weakerPOs" ).sortable({
+            jQuery( "#strongerPOs, #weakerPOs" ).sortable({
                 connectWith: ".connectedSortable",
                 receive: function(event, ui) {
-                    updateCount($("#movementsCount"));
-                    var movedItem = $(ui.item[0]);
+                    updateCount(jQuery("#movementsCount"));
+                    var movedItem = jQuery(ui.item[0]);
                     var previousItem = movedItem.prev();
                     var movedItemPOID = movedItem.data("po_id");
                     var previousItemPOID = 0;
                     if (previousItem.is("li")) {
                         previousItemPOID = previousItem.data("po_id");
                     }
-                    var receiverID = $(this).attr("id");
+                    var receiverID = jQuery(this).attr("id");
                     var senderID = ui.sender.attr("id");
                     socket.emit("inAndOut_change", { 
                         room: roomKey, 
@@ -374,8 +403,8 @@ $allPossibilities = getPOs($groupID, $assignmentID);
 
             function getAllPossibilitiesFromContainer(containerName) {
                 var possibilities = [];
-                $("#" + containerName).find("li").each(function() { 
-                    possibilities.push(getPossibilityFromListItem($(this)));
+                jQuery("#" + containerName).find("li").each(function() { 
+                    possibilities.push(getPossibilityFromListItem(jQuery(this)));
                 });
                 return possibilities;
             }
@@ -388,28 +417,28 @@ $allPossibilities = getPOs($groupID, $assignmentID);
             }
             
             function updateAllPossibilities(allPossibilities) {
-                $("#strongerPOs li").remove();
-                $("#weakerPOs li").remove();
+                jQuery("#strongerPOs li").remove();
+                jQuery("#weakerPOs li").remove();
                 var possibility;
                 for (i = 0; i < allPossibilities.strong.length; i++) {
                     possibility = allPossibilities.strong[i];
-                    $("<li class='ui-state-default possibility'>")
+                    jQuery("<li class='ui-state-default possibility'>")
                         .attr("data-po_id", possibility.id)
                         .text(possibility.text)
-                        .appendTo($("#strongerPOs"));
+                        .appendTo(jQuery("#strongerPOs"));
                 }
                 for (i = 0; i < allPossibilities.weak.length; i++) {
                     possibility = allPossibilities.weak[i];
-                    $("<li class='ui-state-default possibility'>")
+                    jQuery("<li class='ui-state-default possibility'>")
                         .attr("data-po_id", possibility.id)
                         .text(possibility.text)
-                        .appendTo($("#weakerPOs"));
+                        .appendTo(jQuery("#weakerPOs"));
                 }
             }
             
             function updateMovedPossibility(movedItemPOID, previousItemPOID, remoteReceiverID, remoteSenderID) {
-                var localReceiver = $("#" + remoteReceiverID);
-                var localSender = $("#" + remoteSenderID);
+                var localReceiver = jQuery("#" + remoteReceiverID);
+                var localSender = jQuery("#" + remoteSenderID);
                 var localItemToMove = (localSender.find("li[data-po_id='" + movedItemPOID + "']")).remove();
                 if (previousItemPOID == 0) {
                     localItemToMove.prependTo(localReceiver);
@@ -421,21 +450,21 @@ $allPossibilities = getPOs($groupID, $assignmentID);
             }
             
             function storePossibilities(serverPossibilities) {
-                $("#allPossibilitiesData").val(JSON.stringify(serverPossibilities));
+                jQuery("#allPossibilitiesData").val(JSON.stringify(serverPossibilities));
             }
             
-            $("#btnGetOnlyStrongPossibilities").click(function() {
-                updateCount($("#clearOutClicksCount"));
+            jQuery("#btnGetOnlyStrongPossibilities").click(function() {
+                updateCount(jQuery("#clearOutClicksCount"));
                 var allPossibilities = {};
                 allPossibilities.strong = getAllPossibilitiesFromContainer("strongerPOs");
                 allPossibilities.weak = [];
-                $("#weakerPOs").empty();
+                jQuery("#weakerPOs").empty();
                 elgg.system_message('Weaker Possibilities cleared.');
                 socket.emit("inAndOut_filter", { room: roomKey, user: currentUser, allPossibilities: allPossibilities });
             });
             
-            $("#btnResetPossibilities").click(function() {
-                updateCount($("#resetPOsClicksCount"));
+            jQuery("#btnResetPossibilities").click(function() {
+                updateCount(jQuery("#resetPOsClicksCount"));
                 var originalPossibilities = getOriginalPossibilities();
                 updateAllPossibilities(originalPossibilities);         
                 storePossibilities(originalPossibilities);
@@ -446,7 +475,7 @@ $allPossibilities = getPOs($groupID, $assignmentID);
                 
             }
             
-            $("#formInAndOut").submit(function() {
+            jQuery("#formInAndOut").submit(function() {
                 submittedByCurrentUser = true;
                 storeChatData(currentUser, chatData);
                 storeListItems();
@@ -455,7 +484,7 @@ $allPossibilities = getPOs($groupID, $assignmentID);
                 return true;
             }); 
             
-            $(window).unload(function() {
+            jQuery(window).unload(function() {
                 var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
                 elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
                     success: function(result, success, xhr) {
@@ -467,4 +496,4 @@ $allPossibilities = getPOs($groupID, $assignmentID);
     
     <?php include elgg_get_plugins_path()."Core/views/default/Core/myTools/js/chat.php"; ?>
 </script>
-    </div>
+</div>

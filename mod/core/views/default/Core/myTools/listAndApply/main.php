@@ -25,7 +25,8 @@ $activityID    = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -43,6 +44,12 @@ $message  = $_GET['message'];
 
 ?>
 <style>
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
+    }
     #POsContainer {
         width: 60%;
         float: left;
@@ -165,7 +172,7 @@ $message  = $_GET['message'];
     ));
     ?>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -180,10 +187,10 @@ $message  = $_GET['message'];
     var submittedByCurrentUser = false;    
     var timeMeCounter = 0;
     
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
-            var initialPossibilities = JSON.parse($("#initialPossibilities").val());
+            var initialPossibilities = JSON.parse(jQuery("#initialPossibilities").val());
             socket.emit("laa_start", { room: roomKey, user: currentUser, initialPossibilities: initialPossibilities });
         });
         
@@ -198,14 +205,14 @@ $message  = $_GET['message'];
             }
             else if (data.messageType === "laa_listItem_added") {
                 updateListItems(data.listItems);
-                //$("#btnFinishAndSave").show();
+                //jQuery("#btnFinishAndSave").show();
             }
             else if (data.messageType === "laa_possibility_changed") {
                 updatePossibility(data.changedPossibility);
                 savePOs(data.changedPossibility);
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "laa_form_finished") {
@@ -218,10 +225,10 @@ $message  = $_GET['message'];
             }
         });
         
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                updateCount($("#chatEntriesCount"));
-                var chatMessageBox = $(this);
+                updateCount(jQuery("#chatEntriesCount"));
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
@@ -232,31 +239,39 @@ $message  = $_GET['message'];
         TimeMe.callWhenUserLeaves(function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             if (!isNaN(timeSpentOnPage) && timeSpentOnPage > 0) {
-                elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
-                    success: function(result, success, xhr) {} 
-                });  
+                var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
                 console.log('User left. Time on page: ' + timeSpentOnPage + ' seconds. Counter: ' + timeMeCounter);
                 TimeMe.resetAllRecordedPageTimes();
             }
             else {
                 console.log("Refusing to store " + timeSpentOnPage);
             }
-        }, TIMEME_MAX_IDLE_INVOCATIONS);        
+        }, TIMEME_MAX_IDLE_INVOCATIONS);     
         
         function updateListItems(serverListItems) {
             if (serverListItems == undefined) { return; }
             listItems = serverListItems;
             var listItem;
-            var listItemsDiv = $("#listAnswersContainer");
+            var listItemsDiv = jQuery("#listAnswersContainer");
             listItemsDiv.empty();
             for (var i = 0; i < serverListItems.length; i++) {
                 listItem = serverListItems[i];
-                $("<p>" + listItem + "</p>").appendTo(listItemsDiv);
+                jQuery("<p>" + listItem + "</p>").appendTo(listItemsDiv);
             }
         }
         
         function updatePossibility(changedPossibility) {
-            var possibilitiesContainer = $("#possibilities");
+            var possibilitiesContainer = jQuery("#possibilities");
             var poElement = possibilitiesContainer.find("li[data-PO_ID='" + changedPossibility.id + "']:first");
             poElement.text(changedPossibility.text);
         }
@@ -264,31 +279,31 @@ $message  = $_GET['message'];
         function updatePossibilities(possibilities) {
             if (possibilities === undefined) { return; }
             var possibility;
-            var possibilitiesContainer = $("#possibilities");
+            var possibilitiesContainer = jQuery("#possibilities");
             possibilitiesContainer.empty();
             for (var i = 0; i < possibilities.length; i++) {
                 possibility = possibilities[i];
-                $("<li class='ui-state-default possibility' data-PO_ID='" + possibility.id + "' contenteditable='true'>" + possibility.text + "</li>").appendTo(possibilitiesContainer);
+                jQuery("<li class='ui-state-default possibility' data-PO_ID='" + possibility.id + "' contenteditable='true'>" + possibility.text + "</li>").appendTo(possibilitiesContainer);
             }
         }
         
-        $("#btnListItem").click(function() {
-            updateCount($("#listAnswerCount"));
-            var listItemInput = $("#listItem");
+        jQuery("#btnListItem").click(function() {
+            updateCount(jQuery("#listAnswerCount"));
+            var listItemInput = jQuery("#listItem");
             var newListItem = listItemInput.val();
             listItemInput.val("");
             socket.emit("laa_add_listItem", { room: roomKey, user: currentUser, listItem: newListItem });
         });
         
-        $(document).on("mouseenter", ".possibility", (function() {
-            $(this).addClass("editable");
+        jQuery(document).on("mouseenter", ".possibility", (function() {
+            jQuery(this).addClass("editable");
         }));
         
-        $(document).on("mouseleave", ".possibility", (function() {
-            $(this).removeClass("editable");
+        jQuery(document).on("mouseleave", ".possibility", (function() {
+            jQuery(this).removeClass("editable");
         }));
         
-        $(document).on("keydown", "li[contenteditable]", (function(e) {
+        jQuery(document).on("keydown", "li[contenteditable]", (function(e) {
             if (e.keyCode === 13) {
               // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
               document.execCommand('insertHTML', false, '<br /><br />');
@@ -297,12 +312,12 @@ $message  = $_GET['message'];
             }            
         }));
         
-        $('body').on('focus', '[contenteditable]', function() {
-            var $this = $(this);
+        jQuery('body').on('focus', '[contenteditable]', function() {
+            var $this = jQuery(this);
             $this.data('before', $this.html());
             return $this;
         }).on('blur', '[contenteditable]', function() {
-            var $this = $(this);
+            var $this = jQuery(this);
             if ($this.data('before') !== $this.html()) {
                 $this.data('before', $this.html());
                 $this.trigger('change');
@@ -310,9 +325,9 @@ $message  = $_GET['message'];
             return $this;
         });        
         
-        $(document).on("change", "li[contenteditable]", (function() {
-            updateCount($("#POsEditedCount"));
-            var possibility = $(this);
+        jQuery(document).on("change", "li[contenteditable]", (function() {
+            updateCount(jQuery("#POsEditedCount"));
+            var possibility = jQuery(this);
             var changedPossibility = {
                 id: possibility.data("po_id"),
                 text: possibility.html()
@@ -327,7 +342,7 @@ $message  = $_GET['message'];
 //            console.log("after " + allChangedPOs);
         }
         
-        $("#formListAndApply").submit(function() {
+        jQuery("#formListAndApply").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storePOs();
@@ -338,11 +353,11 @@ $message  = $_GET['message'];
         });
         
         function storePOs() {
-            $("#allPOsData").val(JSON.stringify(allChangedPOs));
+            jQuery("#allPOsData").val(JSON.stringify(allChangedPOs));
         }    
         
         function storeListItems() {
-            $("#allListItemsData").val(JSON.stringify(listItems));
+            jQuery("#allListItemsData").val(JSON.stringify(listItems));
         }
     });
     <?php include elgg_get_plugins_path()."Core/views/default/Core/myTools/js/chat.php"; ?>

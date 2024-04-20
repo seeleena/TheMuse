@@ -5,8 +5,72 @@
     </div>
     <style>
         .myFields {
-            margin-left: 20px;
-        }
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .myFields small {
+        margin: 10px;
+    }
+    .myFields input[type="text"] {
+        width: 100%;
+    }
+    .myFields input[type="submit"] {
+        margin-top: 10px;
+    }
+    .myFields select {
+        width: 100%;
+    }
+    .myFields label {
+        font-weight: bold;
+    }
+    .myFields h4 {
+        font-weight: bold;
+    }
+    .myFields a {
+        text-decoration: none;
+        color: #000;
+    }
+    .myFields a:hover {
+        text-decoration: underline;
+    }
+    .myFields input[type="radio"] {
+        margin-right: 5px;
+    }
+    .myFields input[type="radio"]:checked {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:hover {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:active {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:focus {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:visited {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:link {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:checked) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:hover) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:active) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:focus) {
+        background-color: #f9f9f9;
+    }
+    .myFields input[type="radio"]:not(:visited) {
+        background-color: #f9f9f9;
+    }
 
     </style>
     <blockquote>
@@ -16,96 +80,104 @@
         To create a new activity, fill out the form below and click on the "Save Activity" button to add 
         this activity to your creative process.</p>
     </blockquote>
-<?php
-echo elgg_view('input/hidden', array('value' => get_input("aID"),
-                                        'id' => 'aID',
-                                        'name' => 'aID'));
-echo elgg_view('input/hidden', array('value' => get_input("assignID"),
-                                        'id' => 'assignID',
-                                        'name' => 'assignID'));
-echo elgg_view('input/hidden', array('value' => get_input("userID"),
-                                        'id' => 'userID',
-                                        'name' => 'userID'));
-echo elgg_view('input/hidden', array('value' => get_input("cpID"),
-                                        'id' => 'cpID',
-                                        'name' => 'cpID'));
-echo elgg_view('input/hidden', array('value' => get_input("stageNum"),
-                                        'id' => 'stageNum',
-                                        'name' => 'stageNum'));
+    <?php
+    echo elgg_view('input/hidden', array('value' => get_input("aID"),
+                                            'id' => 'aID',
+                                            'name' => 'aID'));
+    echo elgg_view('input/hidden', array('value' => get_input("assignID"),
+                                            'id' => 'assignID',
+                                            'name' => 'assignID'));
+    echo elgg_view('input/hidden', array('value' => get_input("userID"),
+                                            'id' => 'userID',
+                                            'name' => 'userID'));
+    echo elgg_view('input/hidden', array('value' => get_input("cpID"),
+                                            'id' => 'cpID',
+                                            'name' => 'cpID'));
+    echo elgg_view('input/hidden', array('value' => get_input("stageNum"),
+                                            'id' => 'stageNum',
+                                            'name' => 'stageNum'));
 
-echo "<div class='myFields small'>";
-echo "<h3>Describe the Activity</h3><br/>";
-echo "<label>Activity Title</label>";
-echo elgg_view('input/text', array('name' => 'activityTitle'));
-echo "<br/><br/><label>Activity Description</label><br/>";
-echo elgg_view('input/text', array('name' => 'activityDesc'));
+    echo "<div class='myFields small'>";
+    echo "<h3>Describe the Activity</h3><br/>";
+    echo "<label>Activity Title</label>";
+    echo elgg_view('input/text', array('name' => 'activityTitle'));
+    echo "<br/><br/><label>Activity Description</label><br/>";
+    echo elgg_view('input/text', array('name' => 'activityDesc'));
 
-echo "<br/><br/><h3>Describe the Instruction</h3><br/>";
-echo "<label>Instruction 1</label><br/>";
-echo "<div id='dynamicInput'>";
-echo elgg_view('input/text', array('name' => 'instructions[]'));
-echo "</div>";
-$param = "dynamicInput";
-echo "<br/><input type='button' class='elgg-button' value='Add Another Instruction' onClick='addInput(\"$param\");'/><br/><br/>";
+    echo "<br/><br/><h3>Describe the Instruction</h3><br/>";
+    echo "<label>Instruction 1</label><br/>";
+    echo "<div id='dynamicInput'>";
+    echo elgg_view('input/text', array('name' => 'instructions[]'));
+    echo "</div>";
+    $param = "dynamicInput";
+    echo "<br/><input type='button' class='elgg-button' value='Add Another Instruction' onClick='addInput(\"$param\");'/><br/><br/>";
 
-$toolListing = getToolListing();
-$tool = new StdClass;
-$tools = array();
-$tools['0'] = "Select a Tool";
-foreach ($toolListing as $tool) {
-    if(strcmp($tool->name, "Collaborative Input Tool") !== 0 && strcmp($tool->name, "Share Creation Tool") !== 0 && strcmp($tool->name, "Random Word Generator Tool") !== 0 && strcmp($tool->name, "Submission and Scoring Tool") !== 0)
-    $tools[$tool->id] = $tool->name;
-    //error_log("list of toolids: ".$tool->id);
-    //error_log("list of toolnames: ".$tool->name);
-}
-//array_unshift($tools, "Select a Tool");
-//$tools = array_merge(array('0' => 'Select a Tool'), $tools);
-foreach ($tools as $key => $value) {
-    error_log("tools array: $key => $value");
-}
-echo "<br/><br/><h3>Add Tool(s) to your Activity</h3><br/>";
-echo "<label><u>Tool 1</u></label><br/><br/>";
+    $toolListing = getToolListing();
+    $tool = new StdClass;
+    $tools = array();
+    $tools['0'] = "Select a Tool";
+    foreach ($toolListing as $tool) {
+        if(strcmp($tool->name, "Collaborative Input Tool") !== 0 && strcmp($tool->name, "Share Creation Tool") !== 0 && strcmp($tool->name, "Random Word Generator Tool") !== 0 && strcmp($tool->name, "Submission and Scoring Tool") !== 0)
+        $tools[$tool->id] = $tool->name;
+    }
 
-echo "<div id='dynamicInput2'>";
-echo "<label>Enter Tool Name</label><br/>";
-echo elgg_view('input/text', array('name' => 'toolNames[]'));
-echo "<br/><br/><label>Enter Tool URL</label><br/>";
-echo elgg_view('input/text', array('name' => 'toolURLs[]'));
-echo "<br/><br/><label><u>OR</u></label><br/>";
-echo "<br/><label>Select Existing Tool</label><br/>";
-echo elgg_view('input/dropdown', array(
-                'name' => 'tools[]',
-                'value' => 'tools',
-                'options' => $tools,
-                ));
-echo "</div>";
-echo "<br/><input type='button' class='elgg-button' value='Add Another Tool' onclick='addSelect(\"dynamicInput2\");'/><br/>";
-echo "<br/>";
-echo elgg_view('input/submit', array('value'=>'Save Activity'));
+    foreach ($tools as $key => $value) {
+        error_log("tools array: $key => $value");
+    }
+    echo "<br/><br/><h3>Add Tool(s) to your Activity</h3><br/>";
+    echo "<label><u>Tool 1</u></label><br/><br/>";
 
-?>
+    echo "<div id='dynamicInput2'>";
+    echo "<label>Enter Tool Name</label><br/>";
+    echo elgg_view('input/text', array('name' => 'toolNames[]'));
+    echo "<br/><br/><label>Enter Tool URL</label><br/>";
+    echo elgg_view('input/text', array('name' => 'toolURLs[]'));
+    echo "<br/><br/><label><u>OR</u></label><br/>";
+    echo "<br/><label>Select Existing Tool</label><br/>";
+    echo elgg_view('input/dropdown', array(
+                    'name' => 'tools[]',
+                    'value' => 'tools',
+                    'options' => $tools,
+                    ));
+    echo "</div>";
+    echo "<br/><input type='button' class='elgg-button' value='Add Another Tool' onclick='addSelect(\"dynamicInput2\");'/><br/>";
+    echo "<br/>";
+    echo elgg_view('input/submit', array('value'=>'Save Activity'));
+
+    ?>
 </div>
 <script type="text/javascript">
+    // Initialize counters and limit
     var counter = 1;
     var limit = 8;
     var toolCount = 1;
     
+    // Function to add a new instruction input field
     function addInput(divName){
-         if (counter == limit)  {
-              alert("You have reached the limit of adding " + counter + " instructions");
-         }
-         else {
-              var newdiv = document.createElement('div');
-              newdiv.innerHTML = "<br/><label>Instruction " + (counter + 1) + " </label><br/> <input type='text' name='instructions[]'>";
-              document.getElementById(divName).appendChild(newdiv);
-              counter++;
-         }
+        // Check if the limit has been reached
+        if (counter == limit)  {
+            // Alert the user that the limit has been reached
+            alert("You have reached the limit of adding " + counter + " instructions");
+        }
+        else {
+            // Create a new div element
+            var newdiv = document.createElement('div');
+            // Set the inner HTML of the new div
+            newdiv.innerHTML = "<br/><label>Instruction " + (counter + 1) + " </label><br/> <input type='text' name='instructions[]'>";
+            // Append the new div to the specified div
+            document.getElementById(divName).appendChild(newdiv);
+            // Increment the counter
+            counter++;
+        }
     }
     
+    // Function to add a new tool selection field
     function addSelect(divname) {
+        // Create a new div element
         var newDiv=document.createElement('div');
-        var i;
+        // Increment the tool count
         toolCount++;
+        // Initialize the HTML string
         var html = "<br/><label><u>Tool "+ toolCount +"</u></label>";
         html += "<br/><br/><label>Enter Tool Name</label><br/>";
         html += "<input type='text' name='toolNames[]'>";
@@ -113,20 +185,27 @@ echo elgg_view('input/submit', array('value'=>'Save Activity'));
         html += "<input type='text' name='toolURLs[]'>";
         html += "<br/><br/><label><u>OR</u></label><br/><br/><label>Select Existing Tool</label><br/>";
         html += "<select name='tools[]'>";
+        // Initialize arrays to store tool names and IDs
         var toolNames = [];
         var toolIDs = [];
         <?php 
-        
+            // Loop through each tool
             foreach ($tools as $toolID => $tool) {
+                // Add the tool ID and name to the arrays
                 echo "toolIDs.push('" . $toolID . "');";
                 echo "toolNames.push('" . $tool . "');";
             }
         ?>
+        // Loop through each tool name
         for(i = 0; i < toolNames.length; i++) {
+            // Add an option for the tool to the HTML string
             html += "<option value='"+toolIDs[i]+"'>"+toolNames[i]+"</option>";
         }
+        // Close the select tag in the HTML string
         html += '</select>';
+        // Set the inner HTML of the new div
         newDiv.innerHTML= html;
+        // Append the new div to the specified div
         document.getElementById(divname).appendChild(newDiv);
     }
 </script>

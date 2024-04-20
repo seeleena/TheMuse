@@ -24,7 +24,8 @@ $activityID    = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -35,6 +36,12 @@ $_SESSION['assignmentID'] = $assignmentID;
 $_SESSION['activityID'] = $activityID;
 ?>
 <style>
+    .elgg-main {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            
+    }
     #listContainer {
         width: 60%;
         float: left;
@@ -139,6 +146,7 @@ $_SESSION['activityID'] = $activityID;
     ));
     ?>
 </div>  
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -151,7 +159,7 @@ $_SESSION['activityID'] = $activityID;
     var submittedByCurrentUser = false;
     var listItems = [];
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         var socket = io.connect('<?php echo $nodeServer; ?>');
         socket.on("connect", function() {
             socket.emit("list_start", { room: roomKey, user: currentUser });
@@ -169,7 +177,7 @@ $_SESSION['activityID'] = $activityID;
                 updateListItems(data.listItems);
             }
             else if (data.messageType === "chat_message") {
-                writeMessage($("#chat"), data.initiatingUser, data.serverMessage);
+                writeMessage(jQuery("#chat"), data.initiatingUser, data.serverMessage);
                 storeChatData(data.initiatingUser, data.chatData);
             }
             else if (data.messageType === "list_form_finished") {
@@ -185,49 +193,50 @@ $_SESSION['activityID'] = $activityID;
         TimeMe.callWhenUserLeaves(function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             if (!isNaN(timeSpentOnPage) && timeSpentOnPage > 0) {
-                elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
-                    success: function(result, success, xhr) {} 
-                });  
+                var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                $.get(url, function(data, status) {
+                    console.log("Data: " + data + "\nStatus: " + status);
+                });
                 console.log('User left. Time on page: ' + timeSpentOnPage + ' seconds.');
                 TimeMe.resetAllRecordedPageTimes();
             }
             else {
                 console.log("Refusing to store " + timeSpentOnPage);
             }
-        }, TIMEME_MAX_IDLE_INVOCATIONS);          
+        }, TIMEME_MAX_IDLE_INVOCATIONS);         
         
         function updateListItems(serverListItems) {
             if (serverListItems == undefined) { return; }
             listItems = serverListItems;
             var listItem;
-            var listItemsDiv = $("#listItems");
+            var listItemsDiv = jQuery("#listItems");
             listItemsDiv.empty();
             for (var i = 0; i < serverListItems.length; i++) {
                 listItem = serverListItems[i];
-                $("<p>" + listItem.user + ": " + listItem.listItem + "</p>").appendTo(listItemsDiv);
+                jQuery("<p>" + listItem.user + ": " + listItem.listItem + "</p>").appendTo(listItemsDiv);
             }
         }
         
-        $("#btnAddListItem").click(function() {
-            var listItemInput = $("#listItem");
+        jQuery("#btnAddListItem").click(function() {
+            var listItemInput = jQuery("#listItem");
             var newListItem = listItemInput.val();
             listItemInput.val("");
             socket.emit("list_add_listItem", { room: roomKey, user: currentUser, listItem: newListItem });
-            updateCount($("#listItemsAddedCount"));
+            updateCount(jQuery("#listItemsAddedCount"));
         });        
         
-        $("#chatMessage").keyup(function(e) {
+        jQuery("#chatMessage").keyup(function(e) {
             if (e.keyCode === ENTER_KEY_CODE) {
-                var chatMessageBox = $(this);
+                var chatMessageBox = jQuery(this);
                 var message = chatMessageBox.val();
                 chatMessageBox.val("");
                 storeChatMessage(currentUser, message);
                 socket.emit("chat_message", { room: roomKey, user: currentUser, clientMessage: message, chatData: chatData });
-                updateCount($("#chatEntriesCount"));
+                updateCount(jQuery("#chatEntriesCount"));
             }
         });
         
-        $("#formList").submit(function() {
+        jQuery("#formList").submit(function() {
             submittedByCurrentUser = true;
             storeChatData(currentUser, chatData);
             storeListItems();
@@ -236,7 +245,7 @@ $_SESSION['activityID'] = $activityID;
         });
         
         function storeListItems() {
-            $("#allListItemsData").val(JSON.stringify(listItems));
+            jQuery("#allListItemsData").val(JSON.stringify(listItems));
         }        
     });
     
