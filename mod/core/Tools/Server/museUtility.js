@@ -31,10 +31,10 @@ function listAllModules() {
       console.log('Error getting modules: ' + err);
     }
   });
-  console.log('MongoJS Version: ' + data['mongojs']);
-  console.log('MongoDB Version: ' + data['mongodb']);
-  console.log('All versions:');
-  console.log(JSON.stringify(data));
+//   console.log('MongoJS Version: ' + data['mongojs']);
+//   console.log('MongoDB Version: ' + data['mongodb']);
+//   console.log('All versions:');
+//   console.log(JSON.stringify(data));
 }
 
 function debugVar(name, value) {

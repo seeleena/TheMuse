@@ -24,7 +24,8 @@ $activityID    = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -192,16 +193,17 @@ $_SESSION['activityID'] = $activityID;
         TimeMe.callWhenUserLeaves(function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             if (!isNaN(timeSpentOnPage) && timeSpentOnPage > 0) {
-                elgg.get('/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage, {
-                    success: function(result, success, xhr) {} 
-                });  
+                var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                $.get(url, function(data, status) {
+                    console.log("Data: " + data + "\nStatus: " + status);
+                });
                 console.log('User left. Time on page: ' + timeSpentOnPage + ' seconds.');
                 TimeMe.resetAllRecordedPageTimes();
             }
             else {
                 console.log("Refusing to store " + timeSpentOnPage);
             }
-        }, TIMEME_MAX_IDLE_INVOCATIONS);          
+        }, TIMEME_MAX_IDLE_INVOCATIONS);         
         
         function updateListItems(serverListItems) {
             if (serverListItems == undefined) { return; }

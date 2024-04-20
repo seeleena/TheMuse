@@ -29,7 +29,8 @@ $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
 $toolID        = $vars['toolID'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -42,7 +43,7 @@ $_SESSION['activityID'] = $activityID;
 $allPossibilities = getPOs($groupID, $assignmentID);
 
 ?>
-    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+
     <!-- TimeMe -->
     <script type="text/javascript" src="<?php echo getElggJSURL()?>timeme/timeme.min.js"></script>
     <script type="text/javascript" src="<?php echo getElggJSURL()?>common/timing.js"></script>    
@@ -163,8 +164,9 @@ $allPossibilities = getPOs($groupID, $assignmentID);
         ));
         ?>
     </div>  
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>  
-    <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> 
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
+    <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
     <script type="text/javascript">
         var ENTER_KEY_CODE = 13;
         var currentUser = "<?php echo $currentUser->name; ?>";

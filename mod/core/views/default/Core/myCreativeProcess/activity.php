@@ -38,15 +38,14 @@ $userID = elgg_get_logged_in_user_guid();
             border-radius: 3px;
             margin: 10px 0;
         }
-        .myAlignLeft {
-            text-align: left;
-        }
-        .mytext {
-            text-align: left;
-        }
+      
         .imgStyle {
             float: left;
             margin-right: 10px;
+        }
+        .desc {
+            margin: 10px 0;
+            padding-left: 10px;
         }
     </style>
 
@@ -60,156 +59,65 @@ $userID = elgg_get_logged_in_user_guid();
 <!--//Help Button link -->
 <div class='btn-container'>
 <?php
-$params = array(
-    'assignID' => $assignID,
-    'activityID' => $activityID,
-    'stageNum' => $stageNum,
-    'helpme' => 'true'
-);
-$queryString = http_build_query($params);
-$url = getServerURL() . "Core/myCreativeProcess/owner/" . $assignID . "?" . $queryString;
+    // Define parameters for the query string
+    $params = array(
+        'assignID' => $assignID,
+        'activityID' => $activityID,
+        'stageNum' => $stageNum,
+        'helpme' => 'true'
+    );
+    // Build the query string
+    $queryString = http_build_query($params);
+    // Define the URL
+    $url = getServerURL() . "Core/myCreativeProcess/owner/" . $assignID . "?" . $queryString;
 ?>
+<!-- Create a link with the URL -->
 <a href='<?php echo $url ?>' class='blu-btn'>Help Me</a>
 
 </div>
 <?php
-//update
-$instructions = array();
-$instructions = $activity['instructions'];
-$instruction = new StdClass();
-$tools = array();
-$lines = array();
-$i =0; 
-$siteURL = getServerURL().'_graphics/themuse/pensive.jpg';
-//add user-added instructions and tools here. 
-//this for below will be empty? since the activity would not exist.
-//so use and isset on the array.
-foreach ($instructions as $instruction) {
-    $i++;
-    echo "<div class='bubble'>
-        <div class='rectangle'><div class='couponcode'><h2><div class='myAlignLeft'>Instruction $i: <img src='$siteURL' width='30px' height='30px' class='imgStyle'/></div></h2></div>
-        </div>
-        <div class='triangle-l'></div>
-        <div class='triangle-r'></div><br/><br/>";
-    $instructionID = $instruction->id;
-    $lines = $instruction->lines;
-    $tools = $instruction->tools;
-    $line = new StdClass();
-    echo "<div><ul class='bullet mytext'>";
-    foreach ($lines as $line) {
-        $lineID = $line->id;
-        $lineDesc = $line->desc;
-        //error_log("IN ACTIIVTY lineid ".$lineID . "iDesc " . $iDesc);
-        echo "<li >$lineDesc</li>";
-    }
-    echo "</ul></div>";
-    $tool = new StdClass();
-    foreach ($tools as $tool) {
-        $toolName = $tool->name;
-        $toolDesc = $tool->desc;
-        $toolURL = $tool->url;
-        echo "<div class='btn-container'>";
-        echo "<a href='$toolURL?assignID=$assignID&activityID=$activityID&instructionID=$instructionID&stageNum=$stageNum' class='blu-btn'>$toolName</a>";
-        echo "</div>";
-        //echo " </br> $toolDesc </br>  </br>";
-        //
-        //Calculate the CIT completion rate. (Don't know what the other tools will show as yet)
-        //go into the groupsolutioncreativeprocess table: if toolID is 1, it is a CIT
-        //The hardcoded CIT values are in collaborativeinputtoolinstructions table
-        //Given the JSON structure below, there can be more than 1 user's answer per CIT_ID,
-        //so for the completion rate, we need to count whether an answer exists (Not empty string) for
-        //each CIT_ID, eg act:1, instr:1, 3 has CIT_IDs 1, 2 & 3.
-        //The completion values are per instruction. I also want to display 
-        //the rate per instruction and per activity.
-        //The hardcoded CIT completion values are:
-        //      act:1, instr:1, 3   
-        //      act:2, instr:3, 1
-        //      act:2, instr:4, 1
-        //      act:2, instr:5, 1
-        //      act:3, instr:6, 3
-        //      act:4, instr:7, 4
-        //      act:6, instr:9, 2
-        //      act:7, instr:10, 2
-        //      act:8, instr:11, 2
-        //      act:9, instr:12, 6
-        //      act:10, instr:13, 9
-        //      act:18, instr:54, 3
-        //      act:18, instr:55, 2
-        //As separate from completion rate, I need the number of answers posted per CIT_ID per user, 
-        //which means number of answers per question by student.
-        //The JSON structure for CIT from the DB is :
-        /*** SAMPLE DATA STRUCTURE FOR ALLRESPONSES ***/
-/*
-{
-	"groupResponses": [
-		{
-			"userResponses": [{
-				"user": "student1",
-				"answer": "student1 purpose"
-			},
-			{
-				"user": "student2",
-				"answer": "student2 purpose"
-			}],
-			"citID": 1
-		},
-		{
-			"userResponses": [{
-				"user": "student2",
-				"answer": "student2 broad"
-			},
-			{
-				"user": "student1",
-				"answer": "student1 broad"
-			}],
-			"citID": 2
-		},
-		{
-			"userResponses": [{
-				"user": "student2",
-				"answer": "student2 components"
-			},
-			{
-				"user": "student1",
-				"answer": "student1 componenets"
-			}],
-			"citID": 3
-		}
-	]
-}
-*/
-        
-    }
-    echo "</div><br/><br/>";
-}
-/*
-$instructions = array();
-$instructions = $activity['instructions'];
-for($i = 1, $size = count($instructions); $i <= $size; $i++) { 
-    $instructionDetails = array();
-    $instructionDetails = $instructions[$i-1];
-    echo "<div class='elgg-head clearfix'>'<h3 class='elgg-heading-main'>Instruction $i:</h3></div>";
-    echo "<div class='background'><p>";
-    echo $instructionDetails[1];
-    echo "</p></div><br/>";
-    echo "<div class='elgg-head clearfix'>'<h3 class='elgg-heading-main'>List of Tools</h3></div>";
+    // Initialize an array to store instructions
+    $instructions = array();
+    // Get the instructions from the activity
+    $instructions = $activity['instructions'];
+    // Initialize variables
+    $instruction = new StdClass();
     $tools = array();
-    $tools = $instructionDetails[2];
-    echo "<ul class='numberedList'>";
-    for($j = 1, $jsize = count($tools); $j <= $jsize; $j++) { 
-        $tool = array();
-        $tool = $tools[$j-1]; //double check this for other CPs
-        echo "<li>";
-        echo "<a href='$tool[2]$assignID/?activityID=$activityID&instructionID=$instructionDetails[0]'>$tool[0]</a> - $tool[1]";
-        echo "<p></p>";
-        echo "</li>";
+    $lines = array();
+    $i = 0; 
+    // Define the site URL
+    $siteURL = getServerURL().'_graphics/themuse/pensive.jpg';
+    // Loop through each instruction
+    foreach ($instructions as $instruction) {
+        $i++;
+        echo "<div class='bubble'>
+            <div class='rectangle'><div class='couponcode'><h2><div class='myAlignLeft'>Instruction $i: </div></h2></div>
+            </div>
+            <div class='triangle-l'></div>
+            <div class='triangle-r'></div><br/>";
+        $instructionID = $instruction->id;
+        $lines = $instruction->lines;
+        $tools = $instruction->tools;
+        $line = new StdClass();
+        echo "<div><ul class='bullet mytext'>";
+        // Loop through each line
+        foreach ($lines as $line) {
+            $lineID = $line->id;
+            $lineDesc = $line->desc;
+            echo "<h4 class='desc'>$lineDesc</h4>";
+        }
+        echo "</ul></div>";
+        $tool = new StdClass();
+        // Loop through each tool
+        foreach ($tools as $tool) {
+            $toolName = $tool->name;
+            $toolDesc = $tool->desc;
+            $toolURL = $tool->url;
+            echo "<div class='btn-container'>";
+            echo "<a href='$toolURL?assignID=$assignID&activityID=$activityID&instructionID=$instructionID&stageNum=$stageNum' class='blu-btn'>$toolName</a>";
+            echo "</div>";      
+        }
+        echo "</div><br/><br/>";
     }
-    echo "</ul>";
-    echo "</br><div class='elgg-head clearfix'>'<h3 class='elgg-heading-main'>Hints</h3></div>";
-    echo "<p>";
-    echo $instructionDetails[3];
-    echo "</p></br>";
-}*/
-
 ?>
 </div>

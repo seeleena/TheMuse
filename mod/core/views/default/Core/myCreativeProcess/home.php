@@ -85,9 +85,9 @@ if (empty ($codes)) {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript">
     jQuery(document).ready(function() {
-        jQuery("#courseCode").change(function() {
-            var courseCode = jQuery(this).val();
-            var assignmentsDropDown = jQuery("#assignments");
+        var assignmentsDropDown = jQuery("#assignments");
+
+        function loadAssignments(courseCode) {
             assignmentsDropDown.empty().append(jQuery("<option />").val(0).text("Loading assignments...")).prop("disabled", true);
             jQuery.ajax({
                 url: '/Muse/Core/assignment/get/' + courseCode,
@@ -101,7 +101,15 @@ if (empty ($codes)) {
                     assignmentsDropDown.prop("disabled", false);
                 }
             });
+        }
+
+        jQuery("#courseCode").change(function() {
+            var courseCode = jQuery(this).val();
+            loadAssignments(courseCode);
         });
+
+        // Trigger the change event immediately on page load
+        jQuery("#courseCode").trigger('change');
 
         jQuery("#continue").click(function() {
             var assignID = jQuery("#assignments").val();
@@ -109,7 +117,7 @@ if (empty ($codes)) {
             if (parseInt(assignID) > 0) {
                 window.location.href = location.origin + location.pathname.substring(0, location.pathname.indexOf('/', 1)) + "/Core/myCreativeProcess/owner/" + assignID + "?assignID=" + assignID;
             } else {
-                elgg.system_message("Please select your assignment to continue.");
+                <?php elgg_error_response("Please select a valid assignment."); ?>
             }
         });
     });

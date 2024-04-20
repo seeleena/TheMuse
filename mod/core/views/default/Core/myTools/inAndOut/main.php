@@ -32,7 +32,8 @@ $activityID    = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID       = $vars['groupID'];
 $groupMembers  = $vars['groupMembers'];
-$nodeServer    = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser   = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey    = $vars['sessionKey'];
@@ -44,99 +45,119 @@ $_SESSION['activityID'] = $activityID;
 
 $allPossibilities = getPOs($groupID, $assignmentID);
 ?>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> 
     <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
     <!-- TimeMe -->
     <script type="text/javascript" src="<?php echo getElggJSURL()?>timeme/timeme.min.js"></script>
     <script type="text/javascript" src="<?php echo getElggJSURL()?>common/timing.js"></script>    
     <script type="text/javascript" src="<?php echo getElggJSURL()?>common/toolMetrics.js"></script>   
     <style>
-        .elgg-main {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            
+    .elgg-main {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 10px;
     }
-        #poContainer {
-            width: 100%;
-        }
-        #strongerPOs, #weakerPOs {
-            border: 1px solid #444444;
-            width: 100%;
-            min-height: 20px;
-            list-style-type: none;
-            margin: 0;
-            padding: 5px 0 0 0;
-            float: left;
-            margin-right: 10px;
-            height: 300px;
-            overflow: auto;
-        }
-    #strongerPOs li.possibility, #weakerPOs li.possibility {
-        color: white;
-        margin: 0 5px 5px 5px;
-        padding: 5px;
-        font-size: 1.2em;
-        -moz-border-radius: 1em;
-        -webkit-border-radius: 1em;
-        border-radius: 1em;
-        border: 2px solid #006AB6;
-        background: #4690D6;
+
+    #poContainer {
+      width: 100%;
     }
+
+    #strongerPOs,
+    #weakerPOs {
+      border: 1px solid #444444;
+      width: 100%;
+      min-height: 20px;
+      list-style-type: none;
+      margin: 0;
+      padding: 5px 0 0 0;
+      float: left;
+      margin-right: 10px;
+      height: 300px;
+      overflow: auto;
+    }
+
+    #strongerPOs li.possibility,
+    #weakerPOs li.possibility {
+      color: white;
+      margin: 0 5px 5px 5px;
+      padding: 5px;
+      font-size: 1.2em;
+      border-radius: 1em;
+      border: 2px solid #006AB6;
+      background: #4690D6;
+    }
+
     #chatContainer div.border {
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 150px;
-        overflow: auto;
+      border: 1px solid black;
+      height: 150px;
+      overflow: auto;
     }
+
     #listContainer {
-        width: 60%;
-        float: left;
+      width: 60%;
+      float: left;
     }
-    #listContainer div.border{
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 500px;
-        overflow: auto;
+
+    #listContainer div.border {
+      border: 1px solid black;
+      height: 500px;
+      overflow: auto;
     }
+
     #listItems {
-        height: 300px;
-        border: 1px solid black;
-        overflow: auto;
+      height: 300px;
+      border: 1px solid black;
+      overflow: auto;
     }
+
     #chatContainer div.border {
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 100px;
-        overflow: auto;
+      border: 1px solid black;
+      height: 100px;
+      overflow: auto;
     }
+
     #chat {
-        overflow: auto;
-        height: 300px;
+      overflow: auto;
+      height: 300px;
     }
+
     #chatContainer {
-        float: right;
-        width: 38%;
+      float: right;
+      width: 38%;
     }
+
     #formFinishContainer {
-        width: 300px;
-        float: left;
+      width: 300px;
+      float: left;
     }
+
     #listInputContainer {
-        width: 100%;
-        float: left;
+      width: 100%;
+      float: left;
     }
-    #listInputContainer div.border, #chatContainer div.border {
-        border: 1px solid black;
-        /*min-height: 50px;*/
-        height: 300px;
-        overflow: auto;
+
+    #listInputContainer div.border,
+    #chatContainer div.border {
+      border: 1px solid black;
+      height: 300px;
+      overflow: auto;
     }
+
     input[type="submit"] {
-        width: auto;
+      width: auto;
     }
+
     #originalPOs {
-        display: none;
+      display: none;
+    }
+
+    .myHr {
+      border: none;
+      height: 1px;
+      /* Set the appropriate background color */
+      background-color: #ddd;
+      /* Add a bit of opacity */
+      opacity: 0.1;
     }
     
 </style>
@@ -230,6 +251,7 @@ $allPossibilities = getPOs($groupID, $assignmentID);
     ?>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	

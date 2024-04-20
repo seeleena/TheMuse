@@ -1,5 +1,7 @@
 <?php 
 
+//old functions from original repo and are not being used 
+
 include elgg_get_plugins_path()."Core/lib/utilities.php"; 
 include elgg_get_plugins_path()."Core/lib/dbConnection.php"; 
 

@@ -116,7 +116,8 @@ $siteURL = elgg_get_site_url().'_graphics/themuse/info.png';
     <div class='bubble' style = "margin-bottom: 50px;"> 
     <a href='<?php echo getServerURL() . "Core/myCreativeProcess/improvementActivities/$cpID?assignID=$assignID&stageNum=$stageNum" ?>' >
     <div class='couponcode-sugg'>
-        <h2>Suggested Activities <img src='<?php echo $siteURL?>' width='20px' height='20px' class='imgStyle'/></h2>
+        <!-- <h2>Suggested Activities <img src='<?php echo $siteURL?>' width='20px' height='20px' class='imgStyle'/></h2> -->
+        <h2>Suggested Activities </h2>
     </div></a>
 
     <div class='triangle-l'></div>
@@ -144,7 +145,8 @@ foreach($stages as $key) {
     $desc = $key->desc;
     $stageNum = $key->num;
         echo "<div class='bubble'> 
-        <div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name <img src='$siteURL' width='20px' height='20px' class='imgStyle'/></h2><span class='coupontooltip'>$desc</span></div>
+        <!--<div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name <img src='$siteURL' width='20px' height='20px' class='imgStyle'/></h2><span class='coupontooltip'>$desc</span></div> -->
+        <div class='rectangle'><div class='couponcode'><h2>Stage $stageNum: $name</h2><span class='coupontooltip'>$desc</span></div>
         </div>
         <div class='triangle-l'></div>
         <div class='triangle-r'></div>";

@@ -10,7 +10,7 @@ if ($factorRating->rating > 40) {
 }
 $communicationMessage = $vars['communicationMessage'];
 
-//$emptyMessage = (IsNullOrEmptyString($communicationMessage) ? "There are no suggested activities at this time. Please select")
+//$emptyMessage = (IsNullOrEmptyString($communicationMessage) ? "There are no suggested activities at this time. Please select");
 ?>
 <style>
     #noImprovementActivities {

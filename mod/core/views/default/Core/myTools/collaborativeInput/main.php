@@ -162,10 +162,7 @@ echo "</div>";
 
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <script type="text/javascript">
     var ENTER_KEY_CODE = 13;
     var currentUser = "<?php echo $currentUser->name; ?>";
@@ -215,7 +212,7 @@ echo "</div>";
         TimeMe.callWhenUserLeaves(function() {
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             if (!isNaN(timeSpentOnPage) && timeSpentOnPage > 0) {
-                var url = '/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
+                var url = '/Muse/Core/myTools/storeTimeOnPage/?toolID=<?php echo $toolID ?>&studentID=<?php echo $studentELGGID ?>&groupID=<?php echo $groupID ?>&assignmentID=<?php echo $assignmentID ?>&activityID=<?php echo $activityID ?>&instructionID=<?php echo $instructionID ?>&timeOnPage=' + timeSpentOnPage;
                 fetch(url, {
                     method: 'GET',
                     headers: {
@@ -237,7 +234,17 @@ echo "</div>";
         var firstInstruction = jQuery("span.instruction:first");
         firstInstruction.addClass("current");
         populateInstructionFields(firstInstruction);
-        
+
+        jQuery("#btnPostAnswer").prop("disabled", true);
+
+        jQuery("#studentAnswer").on("input", function() {
+            if (jQuery(this).val().length > 0) {
+                jQuery("#btnPostAnswer").prop("disabled", false);
+            } else {
+                jQuery("#btnPostAnswer").prop("disabled", true);
+            }
+        });
+
         jQuery("#btnPostAnswer").click(function() {
             studentAnswer_submitted();
         });
@@ -259,12 +266,14 @@ echo "</div>";
             });    
             var nextInstruction = getNextInstruction();
             if (nextInstruction.length == 0) {
-                toastr.success('All questions have been answered. You may click Finish and Save now.');
+                <?php elgg_error_response("You have to completed all questions."); ?>
                 jQuery("#btnPostAnswer").attr("disabled", "disabled");
+                jQuery("#studentAnswer").prop("disabled", true);
             }
             else {
                 nextInstruction.addClass("current");
                 populateInstructionFields(nextInstruction);
+                jQuery("#btnPostAnswer").prop("disabled", true);
             }
             jQuery("#studentAnswer").val('');
         }

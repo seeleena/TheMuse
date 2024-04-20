@@ -1,10 +1,8 @@
 <?php
-
+    // Include the utilities file from the Core plugin
     include elgg_get_plugins_path()."Core/lib/utilities.php";
 
-    //$viewsData = json_decode(get_input('viewsData'));
-    //$chatData = json_decode(get_input('chatData'));
-
+    // Set the views data, chat data, group ID, assignment ID, activity ID, instruction ID, tool ID, stage number, views entered count, chat entries count, time on page, and student Elgg ID
     $viewsData = get_input('viewsData');
     $chatData = get_input('chatData');
     $groupID = get_input('groupID');
@@ -17,41 +15,28 @@
     $chatEntriesCount = get_input('chatEntriesCount');
     $timeOnPage = get_input('timeOnPage');
     $StudentELGGID = elgg_get_logged_in_user_guid();
-    
+
+    // Store the round robin metrics, group solution creative process, and user CP engagement
     storeRoundRobinMetrics($activityID, $StudentELGGID, $instructionID, $assignmentID, $viewsEnteredCount, $chatEntriesCount, $timeOnPage);
     storeGroupSolutionCreativeProcess($groupID, $assignmentID, $activityID, $instructionID, $toolID, $viewsData, $chatData);
     storeUserCPEngagement($stageNum, $assignmentID, $StudentELGGID, $toolID);
-    //error_log("after here");
-   
-    //$assessmentData = new stdClass();
-    //$assessmentData->tool = "Round Robin";
-    //$assessmentData->activityID = get_input('activityID');;
-    /*
-    $assessmentData->datas = array();
-    
-    $chatDataObject = new stdClass();
-    $chatDataObject->title = "Chat";
-    $chatDataObject->data = $chatData;
-    array_push($assessmentData->datas, $chatDataObject);
-    
-    $viewsDataObject = new stdClass();
-    $viewsDataObject->title = "Views";
-    $viewsDataObject->data = $viewsData;
-    array_push($assessmentData->datas, $viewsDataObject);
-    
-    
-    $assessmentFileName = getAssessmentFileName($groupID, $assignmentID);*/
-    /*$assessmentFilePath = realpath(elgg_get_data_path()) . $assessmentFileName;
-    $handle = fopen($assessmentFilePath, 'a') or die('Cannot append to assessment file: ' . $assessmentFilePath);
-    fwrite($handle, json_encode($assessmentData));
-    fclose($handle);
-    */
-    /*
-    include elgg_get_plugins_path()."Core/lib/creativeProcessFileUpload.php"; 
 
-    $fileGuid = uploadFile($assessmentFileName, $assessmentData);
-    storeFileGuidForGroupSolution($groupID, $assignmentID, $fileGuid, 1);
-    */
-    $returnURL = "/Core/myCreativeProcess/activity/" . $activityID . "?assignID=" . $assignmentID . "&message=" . "Your Round Robin Tool has been saved.";
-    forward($returnURL);
+    // Initialize an array to hold the parameters for the return URL
+    $params = array(
+        'assignID' => $assignmentID,
+        'activityID' => $activityID,
+        'stageNum' => $stageNum,
+    );
+    // Build the query string for the return URL
+    $queryString = http_build_query($params);
+
+    // Set the return URL
+    $returnURL = "Core/myCreativeProcess/owner/" . $assignmentID . "?" . $queryString;
+
+    // Send an OK response and redirect to the return URL
+    elgg_ok_response('', elgg_echo('Your Round Robin has been saved.'), null);
+    header("Location: " . elgg_get_site_url() . $returnURL);
+
+    // Terminate the current script
+    exit();
 ?>

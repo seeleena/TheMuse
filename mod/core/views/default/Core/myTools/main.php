@@ -10,21 +10,42 @@ if (isset($_SESSION['currentAssignID'])) {
     <div class="elgg-head clearfix">
         <h2 class="elgg-heading-main">List of Tools</h2>
     </div>
+    <style> 
+        .elgg-main{
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .elgg-table th {
+            padding: 5px;
+            text-align: left;
+        }
+        .elgg-table td {
+            padding: 5px;
+        }
+        .header {
+            font-weight: bold;
+            color: blue;
+        }
+        .items {
+            
+        }
+    </style>
 <table class="elgg-table">
     <tr>
-        <th width="30%">Name</th>
-        <th>Description</th>
+        <th class='header' >Name</th>
+        <th class='header' >Description</th>
     </tr>
     <?php foreach($toolList as $tool) { ?>
     <tr>
-        <td>
+        <td class='items'>
             <!--a href="<?php  //echo $tool->url.$currentAssignID; ?>"> <?php  //echo $tool->name; ?> </a-->
             <?php  echo $tool->name; ?>
         </td>
-        <td>
+        <td class='items'>
             <?php  echo $tool->description; ?>
         </td>
     </tr>
-     <?php } ?>
+    <?php } ?>
 </table>
-    </div>
+</div>

@@ -2,9 +2,8 @@
 !.htaccess
 !.travis.yml
 !.gitignore
-/elgg-config/settings.php
+!.sh
+/elgg-config_container
+/data
 /cache
-/settings.php
-/mod
-
 /vendor

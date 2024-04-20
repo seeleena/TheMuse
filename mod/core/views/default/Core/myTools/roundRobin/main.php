@@ -6,12 +6,14 @@ $activityID   = $vars['activityID'];
 $instructionID = $vars['instructionID'];
 $groupID      = $vars['groupID'];
 $groupMembers = $vars['groupMembers'];
-$nodeServer   = $vars['nodeServer'];
+//$nodeServer    = $vars['nodeServer'];
+$nodeServer    = 'http://localhost:8888';
 $currentUser  = elgg_get_logged_in_user_entity();
 $studentELGGID = $currentUser->guid;
 $sessionKey   = $vars['sessionKey'];
 $reset        = $_GET['reset'];
 ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
@@ -81,6 +83,12 @@ $_SESSION['activityID'] = $activityID;
     </blockquote>
 
 <style>
+    .elgg-main {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+        
+    }
     .box {
         float: left;
         margin-top: 20px;
@@ -197,10 +205,8 @@ $_SESSION['activityID'] = $activityID;
     ));    
     ?>
 </div>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="<?php echo $nodeServer; ?>/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>	
+
+
 <script type="text/javascript">
     var ENTER_KEY_CODE = 13;
     var currentUser = "<?php echo $currentUser->name; ?>";
@@ -272,7 +278,7 @@ $_SESSION['activityID'] = $activityID;
             return true;
         });
         
-        jQuery(window).unload(function() {
+        jQuery(window).on('beforeunload', function() {
             console.log('unloading...');
             var timeSpentOnPage = Math.round(TimeMe.getTimeOnCurrentPageInSeconds());
             console.log('time on page: ' + timeSpentOnPage);
