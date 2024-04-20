@@ -93,12 +93,13 @@ return [
                 ],
 
                 'default:Core:myCreativeProcess:activity' => [
-                        'path' => 'Core/myCreativeProcess/activity/{activityID}',
+                        'path' => 'Core/myCreativeProcess/activity/{A_ID}',
                         'resource' => 'myCreativeProcess/activity',
                         'middleware' => [
 				\Elgg\Router\Middleware\Gatekeeper::class,
 			],
                 ],
+
 
                 'default:Core:myCreativeProcess:feedbackDashboard' => [
                         'path' => 'Core/myCreativeProcess/feedbackDashboard/{assignmentID}',
@@ -324,3 +325,4 @@ return [
                 'usersettings/save'=> [],
         ],
 ];
+

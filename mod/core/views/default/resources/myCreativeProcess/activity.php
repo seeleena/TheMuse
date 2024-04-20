@@ -1,3 +1,4 @@
+
 <?php
     // Include utilities from the Core plugin
     include elgg_get_plugins_path() . "Core/lib/utilities.php";
@@ -31,3 +32,4 @@
     // The first argument is the title of the page, and the second argument is the body of the page
     echo elgg_view_page($title, $body);
 ?>
+

@@ -1,17 +1,57 @@
-Elgg Starter Project
-====================
+Welcome to The Muse Github Repository!
+======================================
 
-This is a quickstart skeleton for building a site based on Elgg 5.x.
+## Team Members:
+	 Adrian Frection - 816027916
+	 Faith Rose - 816029963
+	 Anuradha Ramlakhan - 816030881
+	 Seeleena Mohammed - 816033259
 
-## Installation
+## Abstract:
 
-Follow the instructions for [installing Elgg with Composer](http://learn.elgg.org/en/stable/intro/install.html#overview).
+The Muse social networking application, developed in 2016, assists students with their creative endeavors during coursework projects and assignments by recording the creative process in real-time, a departure from past methods. It emphasizes early-stage creativity development, supporting research into tertiary-level learning processes. Our project is focused on revitalizing the original code	base, updating dependencies and restructuring the code for clarity and ease of maintenance.  This modernization not only improves Muse's functionality but also paves the way for future development.
 
-## Other versions
 
-If you wish to install a different version of Elgg use the following branches:
+How to use the Muse:
+===================
+  1. Download Elgg
+  2. Install Xampp
+  3. Upload Elgg into Xampp htdocs folder and rename as Muse
+  4. Start Xampp apache and mysql and go to localhost/Muse: http://localhost/Muse
+  5. Setup Elgg on localhost/Muse
+  6. Insert core into Muse mod folder
+  7. Enable core plugin in Elgg Plugin Administration: http://localhost/Muse/admin/plugins/
+  8. Utlize paths documented in elgg-plugin.php
 
-- for Elgg v4.x use the branch 4.x
-- for Elgg v3.3 use the branch 3.3
-- for Elgg v3.0, v3.1 or v3.2 use the branch 3.0
-- for Elgg v2.3 use the branch 2.x
+## Resources:
+	Xampp download: https://www.apachefriends.org/download.html
+	Elgg download: https://elgg.org/about/download
+	Elgg documentation: https://learn.elgg.org/en/stable/index.html
+
+## Need:
+
+The client wants to upgrade The Muse's outdated codebase to improve performance,
+maintainability, and scalability. The modernization seeks to correspond with increasing
+technology standards, improve user experience, and assure The Muse's long-term viability as an
+effective instrument for leading tertiary level students through creative problem-solving.
+
+## Scope:
+The project aims to modernize The Muse by reorganizing code, upgrading dependencies, and
+improving the user experience. The modernization will follow best practices in software
+development, combining cutting-edge technologies and frameworks to improve performance and
+security. Furthermore, the scope includes the review of existing features to ensure they meet
+current pedagogical requirements.
+
+## Objectives:
+
+	● Enhance overall system performance and responsiveness.
+	● Improve the maintainability and readability of the codebase.
+	● Upgrade dependencies and frameworks to current versions.
+	● Evaluate and potentially refine existing features to align with current pedagogical requirements.
+	● Ensure the scalability and future-proofing of The Muse.
+
+## Deliverables:
+	● Refactored and modernized codebase.
+	● Updated documentation reflecting the changes made.
+	● Updated dependencies and frameworks.
+	● Evaluation report on existing features with recommendations for refinement.

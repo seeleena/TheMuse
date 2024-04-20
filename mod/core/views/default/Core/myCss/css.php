@@ -1,5 +1,5 @@
 <?php
-
+//This file is where we import all the CSS that is utilized from
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

@@ -1,3 +1,4 @@
+
 FROM php:8.0-apache
 
 # Install base dependencies
