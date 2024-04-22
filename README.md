@@ -55,3 +55,10 @@ current pedagogical requirements.
 	● Updated documentation reflecting the changes made.
 	● Updated dependencies and frameworks.
 	● Evaluation report on existing features with recommendations for refinement.
+
+## Dockered Version:
+https://hub.docker.com/repository/docker/aratakiyo/muse/general 
+	● Function path routing will need to be fixed. 
+	● Elgg handles path routing with elgg_get_plugins_path() function. 
+	● Unknown interaction between Elgg and docker. 
+
