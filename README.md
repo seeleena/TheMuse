@@ -56,6 +56,29 @@ current pedagogical requirements.
 	● Updated dependencies and frameworks.
 	● Evaluation report on existing features with recommendations for refinement.
 
+## Tests within The Muse Core:
+Tests are run between the database within the Apache server and the database within The Muse Core plugin.
+Install the following command within the core:
+
+	composer require --dev phpunit/phpunit ^11
+
+ Execute the following command to run tests:
+
+ 	./vendor/bin/phpunit –testdox tests
+
+## Tests within Elgg Core:
+Testing within the Elgg are run within its own engine and should be run separately 
+as it can interrupt Elgg network. It is to be noted that these test folders are large 
+and needs to be run separately when possible.
+
+	1.	Change directory to the elgg/elgg/engine.
+ 	2.	Install the following command within the vendor/elgg/elgg/engine:
+  		● composer require --dev phpunit/phpunit
+    	3.	Execute the following command to run tests(separately):
+     		● Unit Tests: ./vendor/bin/phpunit –testdox tests/phpunit/unit
+		● Integration Tests: ./vendor/bin/phpunit –testdox tests/phpunit/integration
+		● Plugin Integration: ./vendor/bin/phpunit –testdox tests/phpunit/plugin_integration
+
 ## Dockered Version:
 https://hub.docker.com/repository/docker/aratakiyo/muse/general
 
