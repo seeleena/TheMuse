@@ -77,7 +77,7 @@ and needs to be run separately when possible.
  		● composer require --dev phpunit/phpunit
 
 	3. Execute the following command to run tests(separately):
-     		● Unit Tests: ./vendor/bin/phpunit –testdox tests/phpunit/unit
+		● Unit Tests: ./vendor/bin/phpunit –testdox tests/phpunit/unit
 		● Integration Tests: ./vendor/bin/phpunit –testdox tests/phpunit/integration
 		● Plugin Integration: ./vendor/bin/phpunit –testdox tests/phpunit/plugin_integration
 
